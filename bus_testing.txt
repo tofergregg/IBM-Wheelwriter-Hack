@@ -1,0 +1,84 @@
+Bus Pirate Channels for OLS:
+
+3v3  ADC  AUX  MOSI MISO
+            4   3    1
+
+                2    0
+GND  +5V  VPU  CLK  CS
+
+Testing typewriter on channels:
+
+BUS: 4
+BRQ: 3
+POR: 1
+VRM: 0
+PDI: 2
+
+need to capture at 1MHz to successfully decode
+
+46us / byte, 5.75us/bit = 173,913 bits/sec, 173.913KHz clock?
+
+----------
+To strike a character:
+Arduino/Keyboard sends a first byte of 0b10000100
+The main typewriter board responds with a byte of 0, then we have a 150us delay
+
+Arduino/Keyboard sends a second byte of 0b11010000
+The main typewriter responds with a byte of zero, then there is a long (1.2ms) delay
+
+Arduino/Keyboard: 0b10000100
+Main typewriter: 0, 150us delay
+
+Arduino/Keyboard: 0b11000000
+Main typewriter: 0, 150us delay
+
+Arduino/Keyboard: char byte (0b10000000 for 'a', 0b10011010 for b, 0b00100000 for 'm', etc. -- there isn't an alphabetic pattern)
+Main typewriter: 0, 150us delay
+
+Arduino/Keyboard: 0b01010000
+Main typewriter: 0, and we're finished
+
+-----------
+
+A pulse always starts by going low, and then has a series of low/high transitions
+for 23us. Then there is an undetermined wait period (high), but probably at least 10us as well, and another signal for 23us happens again.
+
+It looks like there are nine bits and then a string of ones, then nine bits, etc.
+
+4 19 4  9 45 (45) 61 4  9 5 5 22 111 45 (sample beginning of 'a' from typewriter, parens for low byte response from typewriter main processor)
+
+6 20 6 10 43 (46) 43 5 12 5 6 20  43 46 (sample from arduino)
+
+----
+next part of 'a' from typewriter:
+1200 4 5 18 5  9 65 46 62 5  9 32 50 45 87
+
+from arduino:
+1200 5 6 20 6 10 57 45 52 5 12 30 52 45 52
+
+-----
+
+It looks like the keyboard sends a different Return if it doesn't know that a key has been struck (e.g., if we're spoofing keys). It simply sends a line feed.
+Maybe it is keeping track of characters, and only goes back the number of characters it thinks have been typed!
+
+----------------
+
+Return: the typewriter can go back in steps equal to 1/5 of a character.
+So, to go back 1 character, this is 5 micro-backspaces. This is encoded
+in a return command with 10 bits in two bytes, as follows (it's a bit weird):
+
+Multiply the number of characters by 5. E.g., 26 * 5 == 130 = x. 
+
+The first byte is the top 3 bits of the resulting 10-bit number:
+x >> 7
+
+The second byte is the rest of the number, but shifted left by one (not sure why):
+
+(x & 0x7f) << 1
+
+Note: characters 23 and 24 are strange and need to be handled separately from the other returns. Not sure why!
+
+--------------
+Bean pins: D0: yellow, goes to resistor.
+           D1: white, goes to button
+           GND: black, goes to ground on breadboard.
