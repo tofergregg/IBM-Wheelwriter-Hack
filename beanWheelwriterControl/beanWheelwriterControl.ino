@@ -1,5 +1,7 @@
 /*
-  LightBlue Demo Sketch
+  IBM Wheelwriter hack
+  Pin 0: connected through MOSFET to Wheelwriter bus
+         Will pull down the bus when set to zero
  */
 
 static int d0 = 0;
@@ -13,12 +15,6 @@ static int d7 = 7;
 
 #define LETTER_DELAY 150
 #define CHAR_DELAY 150
-
-#define CLR(x,y) (x&=(~(1<<y)))
-
-#define SET(x,y) (x|=(1<<y))
-
-#define _BV(bit) (1 << (bit))
 
 int asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
