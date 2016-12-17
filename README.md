@@ -18,4 +18,32 @@ So far (as of 17 Dec 2016), I have successfully reverse engineered printing char
 * Pulse period: 5.25us
 * Number of pulses sent per command: 10 (an "I'm writing to the bus" to begin, and nine more bits)
 * Normal state of the bus: high (5V), and devices sending commands must pull the bus to low for a zero, and leave high for a one.
-* The first pulse is always a throwaway 0, indicating that someone is going to write 9 more bits to the bus.
+* The first pulse is always a throwaway 0, indicating that a device is going to write 9 more bits to the bus.
+* The next nine bits are (as far as I can tell) in LSB order. Commands seem to always start with 0b100100001 (which is sent right-most bit first). I originally thought the commands were MSB first, but when I was reverse engineering the carriage-return command the numbers came out such that it looks like it is LSB. This makes reading the logic traces in the reverse order from the numeric bit pattern. Maybe I should have kept the MSB ordering in the code because it is easier for humans to read, but I switched it to make it consistent with the way the typewriter expects commands.
+* The reason I am somewhat hesitant to declare the MSB/LSB debate finished is because the character table is completely whacky. It is not ASCII, and it isn't any of the EBCDIC variations I've tracked down. You might think that there would be some method to it, but I haven't yet figured it out. The table below is what I have so far; as you can see, the characters A, B, C have character codes 0x20, 0x12, and 0x1b. I have a feeling that the codes might be based off of the keyboard scan codes, but I haven't found the pattern yet.
+
+int asciiTrans[128] = 
+//col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
+    {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 0
+
+//    
+     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 1
+     
+//    sp     !     "     #     $     %     &     '     (     )     *     +     ,     -     .     /
+     0x00, 0x49, 0x4b, 0x38, 0x37, 0x39, 0x3f, 0x4c, 0x23, 0x16, 0x36, 0x3b, 0xc, 0x0e, 0x57, 0x28, // 2
+     
+//     0     1     2     3     4     5     6     7     8     9     :     ;     <     =     >     ?
+     0x30, 0x2e, 0x2f, 0x2c, 0x32, 0x31, 0x33, 0x35, 0x34, 0x2a ,0x4e, 0x50, 0x00, 0x4d, 0x00, 0x4a, // 3
+
+//     @     A     B     C     D     E     F     G     H     I     J     K     L     M     N     O
+     0x3d, 0x20, 0x12, 0x1b, 0x1d, 0x1e, 0x11, 0x0f, 0x14, 0x1F, 0x21, 0x2b, 0x18, 0x24, 0x1a, 0x22, // 4
+
+//     P     Q     R     S     T     U     V     W     X     Y     Z     [     \     ]     ^     _
+     0x15, 0x3e, 0x17, 0x19, 0x1c, 0x10, 0x0d, 0x29, 0x2d, 0x26, 0x13, 0x41, 0x00, 0x40, 0x00, 0x4f, // 5
+     
+//     `     a     b     c     d     e     f     g     h     i     j     k     l     m     n     o
+     0x00, 0x01, 0x59, 0x05, 0x07, 0x60, 0x0a, 0x5a, 0x08, 0x5d, 0x56, 0x0b, 0x09, 0x04, 0x02, 0x5f, // 6
+     
+//     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
+     0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
+     
