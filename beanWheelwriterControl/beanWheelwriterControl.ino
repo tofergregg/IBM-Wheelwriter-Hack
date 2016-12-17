@@ -63,6 +63,7 @@ void setup()
   //PORTD |= 0b00000100;
 
   pinMode(d2, INPUT); // listening pin
+  // PORTD |= 0b01000000; // the listening pin is mapped to bit 6
 
   // start the input pin off (meaning the bus is high, normal state)
   PORTD &= 0b11111011;
@@ -93,15 +94,15 @@ void loop()
         print_str("\"the quick brown fox jumps over the lazy dog.\"");
         send_return(46);*/
 
-        print_str("testing");
-        /*print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        //print_str("testing");
+        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         send_return(26);
 
         print_str("1234567890");
         send_return(10);
 
         print_str(",./?");
-        send_return(4);*/
+        send_return(4);
         
         /*
         sendByteOnPin(0b00000000);
@@ -121,7 +122,7 @@ void print_str(char *s) {
   }
 }
 
-void sendByteOnPin(int command) {
+inline void sendByteOnPin(int command) {
     // This will actually send 10 bytes,
     // starting with a zero (always)
     // and then the next nine bytes
@@ -261,7 +262,7 @@ void send_letter(int letter) {
     q.enqueue(0b000001010);
     sendBytes();
 
-    //delay(LETTER_DELAY); // before next character
+    delay(LETTER_DELAY); // before next character
 }
 
 void send_return(int numChars) {
@@ -376,12 +377,16 @@ void send_return(int numChars) {
 
 void sendBytes() {
     while (!q.isEmpty()) {
+        //Serial.println("sending bytes!");
         sendByteOnPin(q.dequeue());
         // wait for low then high (for a zero)
-        while (digitalRead(d2) == 1) {
+        //PORTD |= 0b01000000;
+        //int pinStatus = ((PIND & 0b01000000) >> 6);
+        //Serial.println(pinStatus);
+        while (((PIND & 0b01000000) >> 6) == 1) {
           // busy
         }
-        while (digitalRead(d2) == 0) {
+        while (((PIND & 0b01000000) >> 6) == 0) {
           // busy
         }
     }
