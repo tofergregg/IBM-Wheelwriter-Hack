@@ -48,7 +48,7 @@ int asciiTrans[128] =
      
 //     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
      0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
-<pre>
+</pre>
 
 To send commands to the typewriter, we connect one pin of the Arduino to the bus through a MOSFET transistor. When we set this pin high, the bus is pulled low, indicating a zero that we want to send. We capture other devices commands with a different Arduino pin that reads the raw state of the bus.
 
