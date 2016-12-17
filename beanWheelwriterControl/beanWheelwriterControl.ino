@@ -18,8 +18,9 @@ static int d5 = 5;
 static int d6 = 6;
 static int d7 = 7;
 
-#define LETTER_DELAY 150
-#define CHAR_DELAY 150
+#define LETTER_DELAY 170
+#define CARRIAGE_WAIT_BASE 300
+#define CARRIAGE_WAIT_MULTIPLIER 10
 
 QueueArray<int> q; // holds the bytes we will send to the bus
 
@@ -94,7 +95,15 @@ void loop()
         print_str("\"the quick brown fox jumps over the lazy dog.\"");
         send_return(46);*/
 
-        //print_str("testing");
+        /*print_str("ABC");
+        send_return(3);
+
+        print_str("55555");
+        send_return(5);
+
+        print_str("1234567890");
+        send_return(10);
+        
         print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         send_return(26);
 
@@ -102,8 +111,13 @@ void loop()
         send_return(10);
 
         print_str(",./?");
-        send_return(4);
-        
+        send_return(4);*/
+
+        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+        send_return(52);
+
+        print_str("done.");
+        send_return(5);
         /*
         sendByteOnPin(0b00000000);
         delayMicroseconds(60);*/
@@ -270,35 +284,16 @@ void send_return(int numChars) {
     int byte1 = (numChars * 5) >> 7;
     int byte2 = ((numChars * 5) & 0x7f) << 1;
     
-    sendByteOnPin(0b100100001);
-    //delayMicroseconds(200);
-    delay(CHAR_DELAY);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b000001011);
-    delayMicroseconds(1450);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b100100001);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b000001101);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b000000111);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b100100001);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000111);
+    q.enqueue(0b100100001);
     
     if (numChars <= 23 || numChars >= 26) {
-         sendByteOnPin(0b000000110);
-         delayMicroseconds(200);
-         // wait for response of 0b000000000
+        q.enqueue(0b000000110);
+
         // We will send two bytes from a 10-bit number
         // which is numChars * 5. The top three bits
         // of the 10-bit number comprise the first byte,
@@ -306,73 +301,34 @@ void send_return(int numChars) {
         // byte, although the byte needs to be shifted
         // left by one (not sure why)
         // the numbers are calculated above for timing reasons
-        sendByteOnPin(byte1);
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-
-        sendByteOnPin(byte2); // each char is worth 10
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-        
-        sendByteOnPin(0b100100001);
+        q.enqueue(byte1);
+        q.enqueue(byte2); // each char is worth 10
+        q.enqueue(0b100100001);
         // right now, the platten is moving, maybe?
-        delayMicroseconds(1000); // not sure how long to wait
-        // wait for response of 0b000000000
+
     } else if (numChars <= 25) {
         // not sure why this is so different
-        sendByteOnPin(0b000001101);
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-
-        sendByteOnPin(0b000000111);
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-
-        sendByteOnPin(0b100100001); // each char is worth 10
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-        
-        sendByteOnPin(0b000000110);
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-
-        sendByteOnPin(0b000000000);
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-
-        sendByteOnPin(numChars * 10); // each char is worth 10
-        delayMicroseconds(200);
-        // wait for response of 0b000000000
-        
-        sendByteOnPin(0b100100001);
+        q.enqueue(0b000001101);
+        q.enqueue(0b000000111);
+        q.enqueue(0b100100001);
+        q.enqueue(0b000000110);
+        q.enqueue(0b000000000);
+        q.enqueue(numChars * 10);
+        q.enqueue(0b100100001);
         // right now, the platten is moving, maybe?
-        delayMicroseconds(1000); // not sure how long to wait
-        // wait for response of 0b000000000
     }
     
-    sendByteOnPin(0b000000101);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    
-    sendByteOnPin(0b010010000); // missing???
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    // 87ms wait!
-    delay(87);
-    
-    sendByteOnPin(0b100100001);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    
+    q.enqueue(0b000000101);
+    q.enqueue(0b010010000); //
+    q.enqueue(0b100100001);
+    sendBytes();
+
+    // send one more byte but don't wait explicitly for the response
+    // of 0b001010000
     sendByteOnPin(0b000001011);
-    delayMicroseconds(200);
-    // wait for final response of 0b001010000
 
-    delay(2000); // wait for carriage
-
+    // wait for carriage 
+    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
 }
 
 void sendBytes() {
@@ -389,6 +345,7 @@ void sendBytes() {
         while (((PIND & 0b01000000) >> 6) == 0) {
           // busy
         }
+        delayMicroseconds(5); // wait a bit before sending next char
     }
 }
 
