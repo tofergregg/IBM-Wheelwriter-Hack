@@ -113,11 +113,13 @@ void loop()
         print_str(",./?");
         send_return(4);*/
 
-        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-        send_return(52);
+        //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+        //send_return(52);
 
-        print_str("done.");
-        send_return(5);
+        //print_str("done.");
+        //send_return(5);
+
+        print_strln("The quick brown fox jumps over the lazy dog.");
         /*
         sendByteOnPin(0b00000000);
         delayMicroseconds(60);*/
@@ -134,6 +136,12 @@ void print_str(char *s) {
   while (*s != '\0') {
     send_letter(asciiTrans[*s++]);
   }
+}
+
+void print_strln(char *s) {
+  // prints a line and then a carriage return
+  print_str(s);
+  send_return(strlen(s));
 }
 
 inline void sendByteOnPin(int command) {
