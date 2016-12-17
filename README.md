@@ -20,6 +20,7 @@ So far (as of 17 Dec 2016), I have successfully reverse engineered printing char
 * Normal state of the bus: high (5V), and devices sending commands must pull the bus to low for a zero, and leave high for a one.
 * The first pulse is always a throwaway 0, indicating that a device is going to write 9 more bits to the bus.
 * The next nine bits are (as far as I can tell) in LSB order. Commands seem to always start with 0b100100001 (which is sent right-most bit first). I originally thought the commands were MSB first, but when I was reverse engineering the carriage-return command the numbers came out such that it looks like it is LSB. This makes reading the logic traces in the reverse order from the numeric bit pattern. Maybe I should have kept the MSB ordering in the code because it is easier for humans to read, but I switched it to make it consistent with the way the typewriter expects commands.
+* When a device sends its 10 bits on the bus, there is almost always a response from the motor driver PCB (that's what I'm calling it), and this response is usually a 10-byte zero (a 52.5us zero pulse, basically). We need to look for this response before sending the next 10-bit value in our command.
 * The reason I am somewhat hesitant to declare the MSB/LSB debate finished is because the character table is completely whacky. It is not ASCII, and it isn't any of the EBCDIC variations I've tracked down. You might think that there would be some method to it, but I haven't yet figured it out. The table below is what I have so far; as you can see, the characters A, B, C have character codes 0x20, 0x12, and 0x1b. I have a feeling that the codes might be based off of the keyboard scan codes, but I haven't found the pattern yet.
 
 <pre>
@@ -48,3 +49,9 @@ int asciiTrans[128] =
 //     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
      0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
 <pre>
+
+To send commands to the typewriter, we connect one pin of the Arduino to the bus through a MOSFET transistor. When we set this pin high, the bus is pulled low, indicating a zero that we want to send. We capture other devices commands with a different Arduino pin that reads the raw state of the bus.
+
+The hardest part about making the commands work is that there isn't a clock on the bus, and all commands must be timed for as close to 5.25us pulses as we can get. The Arduino is *just* barely fast enough to do this, and you have to resort to directly writing to the PORTD (or PORTB) pin registers and reading from the PIND (or PINB) registers to hit the tolerances. I.e., you can't use digitalWrite() or digitalRead() -- the commands are just too slow. The highest granularity timer we have access to on the Arduino (without going super-duper low-level) is `delayMicroseconds()`, which can come close enough to 5.25us to work, but it takes a bit of fiddling to get right. I will eventually port the code to an Arduino proper, but on the Light Blue Bean+, the tolerances don't have any wiggle room. Side note: the LBB+ has some internal ports rearranged, so PORTD and PORTB do not map to the standard Arduino pins. I've noted that in the code where necessary, and I will ifdef the proper pins when I convert to a normal Arduino.
+
+
