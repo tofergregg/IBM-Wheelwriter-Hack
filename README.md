@@ -22,6 +22,7 @@ So far (as of 17 Dec 2016), I have successfully reverse engineered printing char
 * The next nine bits are (as far as I can tell) in LSB order. Commands seem to always start with 0b100100001 (which is sent right-most bit first). I originally thought the commands were MSB first, but when I was reverse engineering the carriage-return command the numbers came out such that it looks like it is LSB. This makes reading the logic traces in the reverse order from the numeric bit pattern. Maybe I should have kept the MSB ordering in the code because it is easier for humans to read, but I switched it to make it consistent with the way the typewriter expects commands.
 * The reason I am somewhat hesitant to declare the MSB/LSB debate finished is because the character table is completely whacky. It is not ASCII, and it isn't any of the EBCDIC variations I've tracked down. You might think that there would be some method to it, but I haven't yet figured it out. The table below is what I have so far; as you can see, the characters A, B, C have character codes 0x20, 0x12, and 0x1b. I have a feeling that the codes might be based off of the keyboard scan codes, but I haven't found the pattern yet.
 
+<pre>
 int asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 0
@@ -46,4 +47,4 @@ int asciiTrans[128] =
      
 //     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
      0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
-     
+<pre>
