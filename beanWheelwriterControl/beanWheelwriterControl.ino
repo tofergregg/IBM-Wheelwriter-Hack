@@ -22,10 +22,6 @@ static int d7 = 7;
 #define CHAR_DELAY 150
 
 QueueArray<int> q; // holds the bytes we will send to the bus
-int pinChangeCount = 0; // how many times the bus has changed.
-                        // Used to determine if we've received
-                        // a response of zero on the bus
-bool nextCharOkay = true; // flag indicating okay to send a follow-on byte
 
 int asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
@@ -52,7 +48,7 @@ int asciiTrans[128] =
 //     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
      0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
      
-     void setup() 
+void setup() 
 {
   // initialize serial communication at 57600 bits per second:
   Serial.begin(57600);
@@ -67,13 +63,10 @@ int asciiTrans[128] =
   //PORTD |= 0b00000100;
 
   pinMode(d2, INPUT); // listening pin
-  PCintPort::attachInterrupt(d2, pinChanged, CHANGE);
 
-  // start the pin low
+  // start the input pin off (meaning the bus is high, normal state)
   PORTD &= 0b11111011;
-  //SET(PORTD,d7);
-  //digitalWrite(d7,1);
-  pinMode(d1, INPUT_PULLUP);  
+  pinMode(d1, INPUT_PULLUP);
 }
 
 // the loop routine runs over and over again forever:
@@ -254,25 +247,19 @@ void sendByteOnPin(int command) {
     // make sure we aren't still pulling down
     PORTD &= 0b11111011;
 
-    delayMicroseconds(6 ); // wait for pin to go high before we re-enable interrupts
     // re-enable interrupts
     interrupts();
 
 }
 
 void send_letter(int letter) {
-    while (!nextCharOkay) {
-      // busy
-    }
     q.enqueue(0b100100001);
     q.enqueue(0b000001011);
     q.enqueue(0b100100001);
     q.enqueue(0b000000011);
     q.enqueue(letter);
     q.enqueue(0b000001010);
-    pinChangeCount = 1; // pretend we've seen a change on the bus
-    nextCharOkay = false;
-    pinChanged();
+    sendBytes();
 
     //delay(LETTER_DELAY); // before next character
 }
@@ -387,18 +374,15 @@ void send_return(int numChars) {
 
 }
 
-void pinChanged() {
-    if (pinChangeCount == 0) {
-        // first change should be high to low,
-        // second change should be low to high (for a zero)
-        pinChangeCount++;
-    } else {
-        if (!q.isEmpty()) {
-            pinChangeCount = 0;
-            sendByteOnPin(q.dequeue());
+void sendBytes() {
+    while (!q.isEmpty()) {
+        sendByteOnPin(q.dequeue());
+        // wait for low then high (for a zero)
+        while (digitalRead(d2) == 1) {
+          // busy
         }
-        else {
-          nextCharOkay = true;
+        while (digitalRead(d2) == 0) {
+          // busy
         }
     }
 }
