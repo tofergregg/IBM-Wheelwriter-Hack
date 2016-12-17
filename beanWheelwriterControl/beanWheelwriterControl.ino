@@ -2,7 +2,12 @@
   IBM Wheelwriter hack
   Pin 0: connected through MOSFET to Wheelwriter bus
          Will pull down the bus when set to zero
+  Pin 2: ALSO connected to the bus, but listens instead of 
+         sending data
  */
+
+#include<QueueArray.h>
+#include<PinChangeInt.h>
 
 static int d0 = 0;
 static int d1 = 1;
@@ -15,6 +20,12 @@ static int d7 = 7;
 
 #define LETTER_DELAY 150
 #define CHAR_DELAY 150
+
+QueueArray<int> q; // holds the bytes we will send to the bus
+int pinChangeCount = 0; // how many times the bus has changed.
+                        // Used to determine if we've received
+                        // a response of zero on the bus
+bool nextCharOkay = true; // flag indicating okay to send a follow-on byte
 
 int asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
@@ -55,6 +66,9 @@ int asciiTrans[128] =
   // start the pin high
   //PORTD |= 0b00000100;
 
+  pinMode(d2, INPUT); // listening pin
+  PCintPort::attachInterrupt(d2, pinChanged, CHANGE);
+
   // start the pin low
   PORTD &= 0b11111011;
   //SET(PORTD,d7);
@@ -86,14 +100,15 @@ void loop()
         print_str("\"the quick brown fox jumps over the lazy dog.\"");
         send_return(46);*/
 
-        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        print_str("testing");
+        /*print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
         send_return(26);
 
         print_str("1234567890");
         send_return(10);
 
         print_str(",./?");
-        send_return(4);
+        send_return(4);*/
         
         /*
         sendByteOnPin(0b00000000);
@@ -239,46 +254,27 @@ void sendByteOnPin(int command) {
     // make sure we aren't still pulling down
     PORTD &= 0b11111011;
 
+    delayMicroseconds(6 ); // wait for pin to go high before we re-enable interrupts
     // re-enable interrupts
     interrupts();
 
 }
 
 void send_letter(int letter) {
-    /* from typewriter output */
-    sendByteOnPin(0b100100001);
-    //delayMicroseconds(200);
-    delay(CHAR_DELAY); // wait for response
-    // wait for response of 0b000000000
-    
-    
-    sendByteOnPin(0b000001011);
-    delayMicroseconds(1450);
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b100100001);
-    delay(CHAR_DELAY); // wait for response
+    while (!nextCharOkay) {
+      // busy
+    }
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000011);
+    q.enqueue(letter);
+    q.enqueue(0b000001010);
+    pinChangeCount = 1; // pretend we've seen a change on the bus
+    nextCharOkay = false;
+    pinChanged();
 
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b000000011);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-    
-    
-    //sendByteOnPin(0b000000001); // 'a'
-    //sendByteOnPin(0b001011001); // 'b'
-    //sendByteOnPin(0b000000100); // 'm'
-      sendByteOnPin(letter);
-      delayMicroseconds(200);
-    
-    // wait for response of 0b000000000
-    
-    sendByteOnPin(0b000001010);
-    delayMicroseconds(200);
-    // wait for response of 0b000000000
-
-    delay(LETTER_DELAY); // before next character
+    //delay(LETTER_DELAY); // before next character
 }
 
 void send_return(int numChars) {
@@ -390,4 +386,21 @@ void send_return(int numChars) {
     delay(2000); // wait for carriage
 
 }
+
+void pinChanged() {
+    if (pinChangeCount == 0) {
+        // first change should be high to low,
+        // second change should be low to high (for a zero)
+        pinChangeCount++;
+    } else {
+        if (!q.isEmpty()) {
+            pinChangeCount = 0;
+            sendByteOnPin(q.dequeue());
+        }
+        else {
+          nextCharOkay = true;
+        }
+    }
+}
+
 
