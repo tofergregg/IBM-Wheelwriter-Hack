@@ -74,12 +74,30 @@ void setup()
 // the loop routine runs over and over again forever:
 void loop() 
 {
-  char buffer[64];
-  size_t readLength = 64;
-  uint8_t length = 0;  
-         
-      pinMode(d1, INPUT_PULLUP);  //PB1
+      char buffer[64];
+      size_t readLength = 64;
+      uint8_t length = 0;  
       
+      // read as much as is available
+      length = Serial.readBytes( buffer, length-1 );
+    
+      // null-terminate the data so it acts like a string
+      buffer[length] = 0;
+    
+      // if we have data, so do something with it
+      if ( length > 0 )
+      {
+          // strip newline from end and println if we had a newline
+          if (buffer[length-1] == '\r' or buffer[length-1] == '\n') {
+              buffer[length-1] = 0;
+              print_strln(buffer);
+          } else {
+              print_str(buffer);
+          }
+          Bean.setLed(255, 0, 0);
+          Bean.sleep(50);
+          Bean.setLed(0,0,0); 
+      }
       int digital1 = digitalRead(d1);
       if (digital1 == 0) {
         //send_letter(0b000000001); // 'a'
@@ -129,7 +147,7 @@ void loop()
         Bean.sleep(100);
         Bean.setLed(0,0,0); 
       }
-      Bean.sleep(100);  
+      Bean.sleep(10);  
 }
 
 void print_str(char *s) {
