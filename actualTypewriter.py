@@ -25,6 +25,10 @@ if __name__ == "__main__":
                 event = 2
             elif event == curses.KEY_RIGHT:
                 event = 3
+            elif event == curses.KEY_BACKSPACE:
+                event = 0x7f
+            #elif event == 0x7f: # already backspace
+            #    pass
             else:
                 screen.addch(event)
             ser.write(chr(event))

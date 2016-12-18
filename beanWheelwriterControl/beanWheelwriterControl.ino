@@ -94,8 +94,23 @@ void loop()
                   send_return(charCount);
                   charCount = 0; 
               }
-              else if (buffer[i] == 0 or buffer[i] == 1) {
+              else if (buffer[i] == 0 or buffer[i] == 1 or
+                       buffer[i] == 4 or buffer[i] == 5) {
+                        // paper-up/down micro-up/micro-down
                   paper_vert(buffer[i]);
+              }
+              else if (buffer[i] == 2 or buffer[i] == 0x7f) { 
+                  // left arrow or delete
+                  if (charCount > 0) {
+                      backspace_no_correct();
+                      charCount--;
+                  }
+              }
+              else if (buffer[i] == 6) { // micro-backspace
+                  // DOES NOT UPDATE CHARCOUNT!
+                  // THIS WILL CAUSE PROBLEMS WITH RETURN!
+                  // TODO: FIX THIS ISSUE
+                  micro_backspace();
               }
               else {
                   send_letter(asciiTrans[buffer[i]]);
@@ -316,19 +331,44 @@ void send_letter(int letter) {
 void paper_vert(int direction) {
   // 0 == up
   // 1 == down
+  // 4 == micro-up
+  // 5 == micro-down
   q.enqueue(0b100100001);
   q.enqueue(0b000001011);
   q.enqueue(0b100100001);
   q.enqueue(0b000000101);
-  if (direction == 0) { // up
+  if (direction == 0) { // cursor-up (paper-down)
       q.enqueue(0b000001000);
-  } else {
-      q.enqueue(0b010001000); // down
+  } else if (direction == 1) {
+      q.enqueue(0b010001000); // cursor-down (paper-up)
+  } else if (direction == 4) {
+      q.enqueue(0b000000010); // cursor-micro-up (paper-micro-down)
+  } else if (direction == 5) {
+      q.enqueue(0b010000010); // cursor-micro-down (paper-micro-up)
   }
   q.enqueue(0b100100001);
   q.enqueue(0b000001011);
   sendBytes();
-  delay(LETTER_DELAY);
+  delay(LETTER_DELAY * 2); // give it a bit more time
+}
+
+void backspace_no_correct() {
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000100);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b000000000);
+    q.enqueue(0b000001010);
+    q.enqueue(0b100100001);
+    sendBytes();
+  
+    // send one more byte but don't wait explicitly for the response
+    // of 0b000000100
+    sendByteOnPin(0b000001011);
+    delay(LETTER_DELAY * 2); // a bit more time
 }
 
 void send_return(int numChars) {
@@ -381,6 +421,46 @@ void send_return(int numChars) {
 
     // wait for carriage 
     delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
+}
+
+void correct_letter(int letter) {
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000101);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b000000000);
+    q.enqueue(0b000001010);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000100);
+    q.enqueue(letter);
+    q.enqueue(0b000001010);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001100);
+    q.enqueue(0b010010000);
+}
+
+void micro_backspace() {
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001110);
+    q.enqueue(0b011010000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000100);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b000000000);
+    q.enqueue(0b000000010);
+    q.enqueue(0b100100001);
+    sendBytes();
+
+    // send one more byte but don't wait explicitly for the response
+    // of 0b000000100
+    sendByteOnPin(0b000001011);
 }
 
 void sendBytes() {
