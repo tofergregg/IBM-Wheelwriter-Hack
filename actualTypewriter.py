@@ -17,16 +17,18 @@ if __name__ == "__main__":
         screen.addstr("Please start typing! (ctrl-c or ctrl-d to quit)\n")
         while True:
             event = screen.getch()
-            screen.addch(event)
+            if event == curses.KEY_UP:
+                event = 0 # special char for typewriter
+            elif event == curses.KEY_DOWN:
+                event = 1
+            elif event == curses.KEY_LEFT:
+                event = 2
+            elif event == curses.KEY_RIGHT:
+                event = 3
+            else:
+                screen.addch(event)
             ser.write(chr(event))
             time.sleep(0.1)
     finally:
         curses.endwin()
         ser.close()
-
-    if event == curses.KEY_LEFT:
-        print("Left Arrow Key pressed")
-    elif event == curses.KEY_RIGHT:
-        print("Right Arrow Key pressed")
-    else:
-        print(event)

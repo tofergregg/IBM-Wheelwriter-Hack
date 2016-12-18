@@ -94,6 +94,9 @@ void loop()
                   send_return(charCount);
                   charCount = 0; 
               }
+              else if (buffer[i] == 0 or buffer[i] == 1) {
+                  paper_vert(buffer[i]);
+              }
               else {
                   send_letter(asciiTrans[buffer[i]]);
                   charCount++;
@@ -308,6 +311,24 @@ void send_letter(int letter) {
     sendBytes();
 
     delay(LETTER_DELAY); // before next character
+}
+
+void paper_vert(int direction) {
+  // 0 == up
+  // 1 == down
+  q.enqueue(0b100100001);
+  q.enqueue(0b000001011);
+  q.enqueue(0b100100001);
+  q.enqueue(0b000000101);
+  if (direction == 0) { // up
+      q.enqueue(0b000001000);
+  } else {
+      q.enqueue(0b010001000); // down
+  }
+  q.enqueue(0b100100001);
+  q.enqueue(0b000001011);
+  sendBytes();
+  delay(LETTER_DELAY);
 }
 
 void send_return(int numChars) {

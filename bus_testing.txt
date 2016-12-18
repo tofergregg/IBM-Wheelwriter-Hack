@@ -81,4 +81,5 @@ Note: characters 23 and 24 are strange and need to be handled separately from th
 --------------
 Bean pins: D0: yellow, goes to resistor.
            D1: white, goes to button
+           D2: orange, goes to bus
            GND: black, goes to ground on breadboard.
