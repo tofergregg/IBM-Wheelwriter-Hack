@@ -74,6 +74,7 @@ void setup()
 // the loop routine runs over and over again forever:
 void loop() 
 {
+      static int charCount = 0;
       char buffer[64];
       size_t readLength = 64;
       uint8_t length = 0;  
@@ -87,12 +88,16 @@ void loop()
       // if we have data, so do something with it
       if ( length > 0 )
       {
-          // strip newline from end and println if we had a newline
-          if (buffer[length-1] == '\r' or buffer[length-1] == '\n') {
-              buffer[length-1] = 0;
-              print_strln(buffer);
-          } else {
-              print_str(buffer);
+          // print each character
+          for (int i=0; i < length; i++) {
+              if (buffer[i] == '\r' or buffer[i] == '\n') {
+                  send_return(charCount);
+                  charCount = 0; 
+              }
+              else {
+                  send_letter(asciiTrans[buffer[i]]);
+                  charCount++;
+              }
           }
           Bean.setLed(255, 0, 0);
           Bean.sleep(50);
