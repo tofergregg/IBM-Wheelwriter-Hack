@@ -2,6 +2,7 @@
 import serial
 import time
 import sys
+import math
 
 if len(sys.argv) != 2:
     print("Usage:\n\ttextToBean filename")
@@ -12,14 +13,21 @@ ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.5)
 time.sleep(0.5)
 with open(sys.argv[1],"r") as f:
     for line in f:
-        print(len(line))
-        while len(line) != 0:
-            written = ser.write(line)
-            line = line[written:]
-            time.sleep(0.1 * written) # wait 1/10 of a second per character sent
-#        bytesAvail = ser.in_waiting
-#        if bytesAvail > 0:
-#            rec = ser.read(bytesAvail)
-#            if len(rec) > 0:
-#                print(rec)
+        partialLine = line
+        # only send up to 50 characters at a time
+        for chunk in range(int(math.ceil(len(line) / 50.0))):
+            partialLine = line[:50]
+            line = line[50:]
+            while len(partialLine) != 0:
+                written = ser.write(partialLine)
+                sys.stdout.write(partialLine+"(bytes sent:"+str(written)+")")
+                sys.stdout.flush()
+                partialLine = partialLine[written:]
+                # wait fora response with the number of characters printed
+                while True:
+                    response = ser.read(10) # read up to 10 bytes
+                    if len(response) > 0:
+                        print("(bytes written:"+response[:-2]+")") # don't print newline
+                        break
+                    time.sleep(0.2) # wait a bit before checking again
 ser.close()

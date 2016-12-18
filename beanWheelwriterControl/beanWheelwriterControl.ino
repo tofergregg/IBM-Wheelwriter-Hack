@@ -20,7 +20,7 @@ static int d7 = 7;
 
 #define LETTER_DELAY 170
 #define CARRIAGE_WAIT_BASE 300
-#define CARRIAGE_WAIT_MULTIPLIER 10
+#define CARRIAGE_WAIT_MULTIPLIER 15
 
 QueueArray<int> q; // holds the bytes we will send to the bus
 
@@ -95,8 +95,9 @@ void loop()
                   charCount = 0; 
               }
               else if (buffer[i] == 0 or buffer[i] == 1 or
-                       buffer[i] == 4 or buffer[i] == 5) {
-                        // paper-up/down micro-up/micro-down
+                       buffer[i] == 4 or buffer[i] == 21) {
+                        // paper-up/down micro-down/micro-up
+                        // ctrl-d is 4, ctrl-u is 21
                   paper_vert(buffer[i]);
               }
               else if (buffer[i] == 2 or buffer[i] == 0x7f) { 
@@ -120,6 +121,7 @@ void loop()
           Bean.setLed(255, 0, 0);
           Bean.sleep(50);
           Bean.setLed(0,0,0); 
+          Serial.println(length); // return the number of characters printed
       }
       int digital1 = digitalRead(d1);
       if (digital1 == 0) {
@@ -331,8 +333,8 @@ void send_letter(int letter) {
 void paper_vert(int direction) {
   // 0 == up
   // 1 == down
-  // 4 == micro-up
-  // 5 == micro-down
+  // 4 == micro-down
+  // 21 == micro-up
   q.enqueue(0b100100001);
   q.enqueue(0b000001011);
   q.enqueue(0b100100001);
@@ -342,9 +344,9 @@ void paper_vert(int direction) {
   } else if (direction == 1) {
       q.enqueue(0b010001000); // cursor-down (paper-up)
   } else if (direction == 4) {
-      q.enqueue(0b000000010); // cursor-micro-up (paper-micro-down)
-  } else if (direction == 5) {
       q.enqueue(0b010000010); // cursor-micro-down (paper-micro-up)
+  } else if (direction == 21) {
+      q.enqueue(0b000000010); // cursor-micro-up (paper-micro-down)
   }
   q.enqueue(0b100100001);
   q.enqueue(0b000001011);

@@ -27,12 +27,15 @@ if __name__ == "__main__":
                 event = 3
             elif event == curses.KEY_BACKSPACE:
                 event = 0x7f
-            #elif event == 0x7f: # already backspace
-            #    pass
+            elif event == 0x7f: # already backspace
+                pass
+            elif event == 393: # shift left-arrow for micro-backspace
+                event = 6 # what the Arduino is expecting
             else:
                 screen.addch(event)
+            #screen.addstr(str(event))
             ser.write(chr(event))
-            time.sleep(0.1)
+            time.sleep(0.25)
     finally:
         curses.endwin()
         ser.close()
