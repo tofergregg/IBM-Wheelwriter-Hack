@@ -4,7 +4,7 @@ import curses,serial,time
 
 if __name__ == "__main__":
     # setup serial
-    ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.5)
+    ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.05)
     
     # wait a bit
     time.sleep(0.5)
@@ -35,7 +35,11 @@ if __name__ == "__main__":
                 screen.addch(event)
             #screen.addstr(str(event))
             ser.write(chr(event))
-            time.sleep(0.25)
+            while True:
+                written = ser.read(5) # no more than 5 characters
+                if len(written) > 0:
+                    break
+            #time.sleep(0.25)
     finally:
         curses.endwin()
         ser.close()

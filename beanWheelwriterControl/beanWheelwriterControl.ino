@@ -118,10 +118,10 @@ void loop()
                   charCount++;
               }
           }
+          Serial.println(length); // return the number of characters printed
           Bean.setLed(255, 0, 0);
           Bean.sleep(50);
           Bean.setLed(0,0,0); 
-          Serial.println(length); // return the number of characters printed
       }
       int digital1 = digitalRead(d1);
       if (digital1 == 0) {
@@ -169,7 +169,7 @@ void loop()
         /////////////
         //PORTD &= 0b11111011;
         Bean.setLed(255, 0, 0);
-        Bean.sleep(100);
+        Bean.sleep(10);
         Bean.setLed(0,0,0); 
       }
       Bean.sleep(10);  
