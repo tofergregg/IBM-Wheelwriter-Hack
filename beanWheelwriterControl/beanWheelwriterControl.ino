@@ -86,7 +86,16 @@ void loop()
       buffer[length] = 0;
     
       // if we have data, so do something with it
-      if ( length > 0 )
+      // if we get more than one character, assume fast text
+      if (length > 1) {
+         fastText(buffer);
+         charCount+=length;
+         Serial.println(length); // return the number of characters printed
+         Bean.setLed(255, 0, 0);
+         Bean.sleep(50);
+         Bean.setLed(0,0,0); 
+      }
+      if ( length == 1 )
       {
           // print each character
           for (int i=0; i < length; i++) {
@@ -125,6 +134,7 @@ void loop()
       }
       int digital1 = digitalRead(d1);
       if (digital1 == 0) {
+        fastText("this is really fast");
         //send_letter(0b000000001); // 'a'
         //send_letter(0b001011001); // 'b'
         //send_letter(0b000000100); // 'm'
@@ -162,7 +172,7 @@ void loop()
         //print_str("done.");
         //send_return(5);
 
-        print_strln("The quick brown fox jumps over the lazy dog.");
+        //print_strln("The quick brown fox jumps over the lazy dog.");
         /*
         sendByteOnPin(0b00000000);
         delayMicroseconds(60);*/
@@ -482,5 +492,63 @@ void sendBytes() {
         delayMicroseconds(5); // wait a bit before sending next char
     }
 }
+void fastText(char *s) {
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001011);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001001);
+    q.enqueue(0b000000000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001010);
+    q.enqueue(0b000000000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000110);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b010000000);
+    q.enqueue(0b000000000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000101);
+    q.enqueue(0b010000000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000010010);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b010000000);
+    q.enqueue(0b000000000);
+    
+    // letters start here
+    while (*s != '\0') {
+        q.enqueue(0b100100001);
+        q.enqueue(0b000000011);
+    
+        q.enqueue(asciiTrans[*s++]);
+        
+        q.enqueue(0b000001010);
+    }
+
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001001);
+    q.enqueue(0b000000000);
+    /*
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001100);
+    q.enqueue(0b001000000);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000001101);
+    q.enqueue(0b000000111);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000110);
+    q.enqueue(0b000000001);
+    q.enqueue(0b011110100);
+    q.enqueue(0b100100001);
+    q.enqueue(0b000000101);
+    q.enqueue(0b010010000);*/
+    sendBytes();
+    delay(LETTER_DELAY * 2); // a bit more time
+}
+
 
 
