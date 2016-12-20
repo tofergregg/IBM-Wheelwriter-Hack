@@ -35,9 +35,11 @@ if __name__ == "__main__":
                 screen.addch(event)
             #screen.addstr(str(event))
             ser.write(chr(event))
+            written = ''
             while True:
-                written = ser.read(5) # no more than 5 characters
-                if len(written) > 0:
+                written += ser.read() # read one character 
+                if len(written) > 0 and written[-1] == '\n':
+                    written = ''
                     break
             #time.sleep(0.25)
     finally:

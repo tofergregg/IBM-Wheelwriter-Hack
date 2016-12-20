@@ -95,7 +95,7 @@ void loop()
          Bean.sleep(50);
          Bean.setLed(0,0,0); 
       }
-      if ( length == 1 )
+      else if ( length == 1 )
       {
           // print each character
           for (int i=0; i < length; i++) {
@@ -517,7 +517,12 @@ void fastText(char *s) {
     q.enqueue(0b100100001);
     q.enqueue(0b000000110);
     q.enqueue(0b010000000);
-    q.enqueue(0b000000000);
+    // if odd, send 0:
+    if (strlen(s) % 2 == 1 or strlen(s) < 26) {
+        q.enqueue(0b000000000);
+    } else {
+        q.enqueue(0b000000101);
+    }
     
     // letters start here
     while (*s != '\0') {
