@@ -4,7 +4,7 @@ import time
 import sys
 import math
 
-MAXLINE = 20
+MAXLINE = 30
 
 if len(sys.argv) != 2:
     print("Usage:\n\ttextToBean filename")

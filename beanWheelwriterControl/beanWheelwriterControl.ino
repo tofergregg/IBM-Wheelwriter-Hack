@@ -12,11 +12,6 @@
 static int d0 = 0;
 static int d1 = 1;
 static int d2 = 2;
-static int d3 = 3;
-static int d4 = 4;
-static int d5 = 5;
-static int d6 = 6;
-static int d7 = 7;
 
 #define LETTER_DELAY 170
 #define CARRIAGE_WAIT_BASE 300
@@ -24,7 +19,7 @@ static int d7 = 7;
 
 QueueArray<int> q; // holds the bytes we will send to the bus
 
-int asciiTrans[128] = 
+byte asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
     {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // 0
 
@@ -75,8 +70,8 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      char buffer[64];
-      size_t readLength = 64;
+      char buffer[200];
+      size_t readLength = 200;
       uint8_t length = 0;  
       
       // read as much as is available
@@ -88,9 +83,10 @@ void loop()
       // if we have data, so do something with it
       // if we get more than one character, assume fast text
       if (length > 1) {
+         Serial.println(length);
          fastText(buffer);
          charCount+=length;
-         Serial.println(length); // return the number of characters printed
+         //Serial.println(length); // return the number of characters printed
          Bean.setLed(255, 0, 0);
          Bean.sleep(50);
          Bean.setLed(0,0,0); 
@@ -127,7 +123,7 @@ void loop()
                   charCount++;
               }
           }
-          Serial.println(length); // return the number of characters printed
+          //Serial.println(length); // return the number of characters printed
           Bean.setLed(255, 0, 0);
           Bean.sleep(50);
           Bean.setLed(0,0,0); 
@@ -551,6 +547,7 @@ void fastText(char *s) {
     q.enqueue(0b100100001);
     q.enqueue(0b000000101);
     q.enqueue(0b010010000);*/
+    Serial.println("About to send bytes.");
     sendBytes();
     delay(LETTER_DELAY * 2); // a bit more time
 }
