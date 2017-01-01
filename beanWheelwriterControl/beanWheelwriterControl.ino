@@ -127,7 +127,8 @@ void loop()
       }
       byte digital1 = digitalRead(d1);
       if (digital1 == 0) {
-        fastText("this is really fast");
+        forwardSpaces(5);
+        //fastText("this is really fast");
         //send_letter(0b000000001); // 'a'
         //send_letter(0b001011001); // 'b'
         //send_letter(0b000000100); // 'm'
@@ -466,6 +467,29 @@ void micro_backspace() {
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
     sendByteOnPin(0b000001011);
+}
+
+void forwardSpaces(int num_spaces) {
+    sendByte(0b100100001);
+    sendByte(0b000001110);
+    sendByte(0b010010110);
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000110);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    
+    //sendByte(0b010000001);
+    sendByte(0b010000000);
+     
+    sendByte(0b001111100);
+    sendByte(0b100100001);
+    sendByte(0b000000111);
+    sendByte(0b100100001);
+    sendByte(0b000001001);
+    sendByte(0b010000000);
 }
 
 void sendByte(int b) {
