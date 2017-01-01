@@ -6,7 +6,6 @@
          sending data
  */
 
-#include<QueueArray.h>
 #include<PinChangeInt.h>
 
 static int d0 = 0;
@@ -16,8 +15,6 @@ static int d2 = 2;
 #define LETTER_DELAY 170
 #define CARRIAGE_WAIT_BASE 300
 #define CARRIAGE_WAIT_MULTIPLIER 15
-
-QueueArray<int> q; // holds the bytes we will send to the bus
 
 byte asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
@@ -325,13 +322,13 @@ inline void sendByteOnPin(int command) {
 }
 
 void send_letter(int letter) {
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000011);
-    q.enqueue(letter);
-    q.enqueue(0b000001010);
-    sendBytes();
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000000011);
+    sendByte(letter);
+    sendByte(0b000001010);
+    
 
     delay(LETTER_DELAY); // before next character
 }
@@ -341,37 +338,37 @@ void paper_vert(int direction) {
   // 1 == down
   // 4 == micro-down
   // 21 == micro-up
-  q.enqueue(0b100100001);
-  q.enqueue(0b000001011);
-  q.enqueue(0b100100001);
-  q.enqueue(0b000000101);
+  sendByte(0b100100001);
+  sendByte(0b000001011);
+  sendByte(0b100100001);
+  sendByte(0b000000101);
   if (direction == 0) { // cursor-up (paper-down)
-      q.enqueue(0b000001000);
+      sendByte(0b000001000);
   } else if (direction == 1) {
-      q.enqueue(0b010001000); // cursor-down (paper-up)
+      sendByte(0b010001000); // cursor-down (paper-up)
   } else if (direction == 4) {
-      q.enqueue(0b010000010); // cursor-micro-down (paper-micro-up)
+      sendByte(0b010000010); // cursor-micro-down (paper-micro-up)
   } else if (direction == 21) {
-      q.enqueue(0b000000010); // cursor-micro-up (paper-micro-down)
+      sendByte(0b000000010); // cursor-micro-up (paper-micro-down)
   }
-  q.enqueue(0b100100001);
-  q.enqueue(0b000001011);
-  sendBytes();
+  sendByte(0b100100001);
+  sendByte(0b000001011);
+  
   delay(LETTER_DELAY * 2); // give it a bit more time
 }
 
 void backspace_no_correct() {
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000100);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b000000000);
-    q.enqueue(0b000001010);
-    q.enqueue(0b100100001);
-    sendBytes();
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000100);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b000000000);
+    sendByte(0b000001010);
+    sendByte(0b100100001);
+    
   
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
@@ -384,15 +381,15 @@ void send_return(int numChars) {
     int byte1 = (numChars * 5) >> 7;
     int byte2 = ((numChars * 5) & 0x7f) << 1;
     
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000111);
-    q.enqueue(0b100100001);
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000111);
+    sendByte(0b100100001);
     
     if (numChars <= 23 || numChars >= 26) {
-        q.enqueue(0b000000110);
+        sendByte(0b000000110);
 
         // We will send two bytes from a 10-bit number
         // which is numChars * 5. The top three bits
@@ -401,27 +398,27 @@ void send_return(int numChars) {
         // byte, although the byte needs to be shifted
         // left by one (not sure why)
         // the numbers are calculated above for timing reasons
-        q.enqueue(byte1);
-        q.enqueue(byte2); // each char is worth 10
-        q.enqueue(0b100100001);
+        sendByte(byte1);
+        sendByte(byte2); // each char is worth 10
+        sendByte(0b100100001);
         // right now, the platten is moving, maybe?
 
     } else if (numChars <= 25) {
         // not sure why this is so different
-        q.enqueue(0b000001101);
-        q.enqueue(0b000000111);
-        q.enqueue(0b100100001);
-        q.enqueue(0b000000110);
-        q.enqueue(0b000000000);
-        q.enqueue(numChars * 10);
-        q.enqueue(0b100100001);
+        sendByte(0b000001101);
+        sendByte(0b000000111);
+        sendByte(0b100100001);
+        sendByte(0b000000110);
+        sendByte(0b000000000);
+        sendByte(numChars * 10);
+        sendByte(0b100100001);
         // right now, the platten is moving, maybe?
     }
     
-    q.enqueue(0b000000101);
-    q.enqueue(0b010010000); //
-    q.enqueue(0b100100001);
-    sendBytes();
+    sendByte(0b000000101);
+    sendByte(0b010010000); //
+    sendByte(0b100100001);
+    
 
     // send one more byte but don't wait explicitly for the response
     // of 0b001010000
@@ -432,53 +429,48 @@ void send_return(int numChars) {
 }
 
 void correct_letter(int letter) {
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000101);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b000000000);
-    q.enqueue(0b000001010);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000100);
-    q.enqueue(letter);
-    q.enqueue(0b000001010);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001100);
-    q.enqueue(0b010010000);
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000101);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b000000000);
+    sendByte(0b000001010);
+    sendByte(0b100100001);
+    sendByte(0b000000100);
+    sendByte(letter);
+    sendByte(0b000001010);
+    sendByte(0b100100001);
+    sendByte(0b000001100);
+    sendByte(0b010010000);
 }
 
 void micro_backspace() {
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001110);
-    q.enqueue(0b011010000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000100);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b000000000);
-    q.enqueue(0b000000010);
-    q.enqueue(0b100100001);
-    sendBytes();
+    sendByte(0b100100001);
+    sendByte(0b000001110);
+    sendByte(0b011010000);
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000100);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b000000000);
+    sendByte(0b000000010);
+    sendByte(0b100100001);
+    
 
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
     sendByteOnPin(0b000001011);
 }
 
-void sendBytes() {
-    while (!q.isEmpty()) {
-        //Serial.println("sending bytes!");
-        sendByteOnPin(q.dequeue());
-        // wait for low then high (for a zero)
-        //PORTD |= 0b01000000;
-        //int pinStatus = ((PIND & 0b01000000) >> 6);
-        //Serial.println(pinStatus);
+void sendByte(int b) {
+        //Serial.println("sending byte!");
+        sendByteOnPin(b);
         while (((PIND & 0b01000000) >> 6) == 1) {
           // busy
         }
@@ -486,71 +478,70 @@ void sendBytes() {
           // busy
         }
         delayMicroseconds(5); // wait a bit before sending next char
-    }
 }
 void fastText(char *s) {
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001011);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001001);
-    q.enqueue(0b000000000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001010);
-    q.enqueue(0b000000000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000110);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b010000000);
-    q.enqueue(0b000000000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000101);
-    q.enqueue(0b010000000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000010010);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b010000000);
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001001);
+    sendByte(0b000000000);
+    sendByte(0b100100001);
+    sendByte(0b000001010);
+    sendByte(0b000000000);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000110);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b010000000);
+    sendByte(0b000000000);
+    sendByte(0b100100001);
+    sendByte(0b000000101);
+    sendByte(0b010000000);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000010010);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b010000000);
     //Serial.print("queue size: ");
     //Serial.println(q.count());
     // if odd, send 0:
     if (strlen(s) % 2 == 1 or strlen(s) < 26) {
-        q.enqueue(0b000000000);
+        sendByte(0b000000000);
     } else {
-        q.enqueue(0b000000101);
+        sendByte(0b000000101);
     }
     
     // letters start here
     while (*s != '\0') {
-        q.enqueue(0b100100001);
-        q.enqueue(0b000000011);
+        sendByte(0b100100001);
+        sendByte(0b000000011);
     
-        q.enqueue(asciiTrans[*s++]);
+        sendByte(asciiTrans[*s++]);
         
-        q.enqueue(0b000001010);
+        sendByte(0b000001010);
     }
 
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001001);
-    q.enqueue(0b000000000);
+    sendByte(0b100100001);
+    sendByte(0b000001001);
+    sendByte(0b000000000);
     /*
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001100);
-    q.enqueue(0b001000000);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000001101);
-    q.enqueue(0b000000111);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000110);
-    q.enqueue(0b000000001);
-    q.enqueue(0b011110100);
-    q.enqueue(0b100100001);
-    q.enqueue(0b000000101);
-    q.enqueue(0b010010000);*/
+    sendByte(0b100100001);
+    sendByte(0b000001100);
+    sendByte(0b001000000);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000111);
+    sendByte(0b100100001);
+    sendByte(0b000000110);
+    sendByte(0b000000001);
+    sendByte(0b011110100);
+    sendByte(0b100100001);
+    sendByte(0b000000101);
+    sendByte(0b010010000);*/
     //Serial.println("About to send bytes.");
-    sendBytes();
+    
     delay(LETTER_DELAY * 2); // a bit more time
 }
 
