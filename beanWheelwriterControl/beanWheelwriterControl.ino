@@ -70,8 +70,8 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      char buffer[200];
-      size_t readLength = 200;
+      char buffer[80];
+      size_t readLength = 80;
       uint8_t length = 0;  
       
       // read as much as is available
@@ -94,7 +94,7 @@ void loop()
       else if ( length == 1 )
       {
           // print each character
-          for (int i=0; i < length; i++) {
+          for (byte i=0; i < length; i++) {
               if (buffer[i] == '\r' or buffer[i] == '\n') {
                   send_return(charCount);
                   charCount = 0; 
@@ -128,7 +128,7 @@ void loop()
           Bean.sleep(50);
           Bean.setLed(0,0,0); 
       }
-      int digital1 = digitalRead(d1);
+      byte digital1 = digitalRead(d1);
       if (digital1 == 0) {
         fastText("this is really fast");
         //send_letter(0b000000001); // 'a'
@@ -513,6 +513,8 @@ void fastText(char *s) {
     q.enqueue(0b100100001);
     q.enqueue(0b000000110);
     q.enqueue(0b010000000);
+    //Serial.print("queue size: ");
+    //Serial.println(q.count());
     // if odd, send 0:
     if (strlen(s) % 2 == 1 or strlen(s) < 26) {
         q.enqueue(0b000000000);
@@ -547,7 +549,7 @@ void fastText(char *s) {
     q.enqueue(0b100100001);
     q.enqueue(0b000000101);
     q.enqueue(0b010010000);*/
-    Serial.println("About to send bytes.");
+    //Serial.println("About to send bytes.");
     sendBytes();
     delay(LETTER_DELAY * 2); // a bit more time
 }
