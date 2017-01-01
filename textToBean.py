@@ -4,7 +4,7 @@ import time
 import sys
 import math
 
-MAXLINE = 30
+MAXLINE = 60 
 
 if len(sys.argv) != 2:
     print("Usage:\n\ttextToBean filename")
@@ -44,6 +44,6 @@ with open(sys.argv[1],"r") as f:
             if len(response) > 0 and response[-1] == '\n':
                 print("(bytes written:"+response.rstrip()+")")
                 break
-            time.sleep(0.2)
+            time.sleep(0.1)
 
 ser.close()

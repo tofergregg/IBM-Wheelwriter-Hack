@@ -67,8 +67,8 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      char buffer[80];
-      size_t readLength = 80;
+      char buffer[100];
+      size_t readLength = 100;
       uint8_t length = 0;  
       
       // read as much as is available
@@ -120,7 +120,7 @@ void loop()
                   charCount++;
               }
           }
-          //Serial.println(length); // return the number of characters printed
+          Serial.println(length); // return the number of characters printed
           Bean.setLed(255, 0, 0);
           Bean.sleep(50);
           Bean.setLed(0,0,0); 
@@ -504,14 +504,14 @@ void fastText(char *s) {
     sendByte(0b100100001);
     sendByte(0b000000110);
     sendByte(0b010000000);
-    //Serial.print("queue size: ");
-    //Serial.println(q.count());
+    
     // if odd, send 0:
-    if (strlen(s) % 2 == 1 or strlen(s) < 26) {
+    /*if (strlen(s) % 2 == 1 or strlen(s) < 26) {
         sendByte(0b000000000);
     } else {
         sendByte(0b000000101);
-    }
+    }*/
+    sendByte(0b000000000);
     
     // letters start here
     while (*s != '\0') {
