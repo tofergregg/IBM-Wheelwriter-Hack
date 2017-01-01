@@ -67,116 +67,192 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      char buffer[100];
-      size_t readLength = 100;
-      uint8_t length = 0;  
-      
-      // read as much as is available
-      length = Serial.readBytes( buffer, length-1 );
+      char buffer[65];
+      uint8_t readLength = 65;
+      uint8_t bytesRead = 0;
+      uint8_t bufferPos = 0;
+      uint16_t bytesToPrint; 
+
+      if (Serial.available() > 0) {
+          // read up to readLength bytes
+          bytesRead = Serial.readBytes(buffer, readLength-1 );
+          Serial.print("Read ");
+          Serial.print(bytesRead);
+          Serial.println(" bytes.");
+
+          // if we get less than three bytes, we don't have a proper transmission
+          if (bytesRead >= 3) {
+              bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
+              bufferPos = 2; // we read two bytes already
     
-      // null-terminate the data so it acts like a string
-      buffer[length] = 0;
-    
-      // if we have data, so do something with it
-      // if we get more than one character, assume fast text
-      if (length > 1) {
-         Serial.println(length);
-         fastText(buffer);
-         charCount+=length;
-         //Serial.println(length); // return the number of characters printed
-         Bean.setLed(255, 0, 0);
-         Bean.sleep(50);
-         Bean.setLed(0,0,0); 
-      }
-      else if ( length == 1 )
-      {
-          // print each character
-          for (byte i=0; i < length; i++) {
-              if (buffer[i] == '\r' or buffer[i] == '\n') {
-                  send_return(charCount);
-                  charCount = 0; 
-              }
-              else if (buffer[i] == 0 or buffer[i] == 1 or
-                       buffer[i] == 4 or buffer[i] == 21) {
-                        // paper-up/down micro-down/micro-up
-                        // ctrl-d is 4, ctrl-u is 21
-                  paper_vert(buffer[i]);
-              }
-              else if (buffer[i] == 2 or buffer[i] == 0x7f) { 
-                  // left arrow or delete
-                  if (charCount > 0) {
-                      backspace_no_correct();
-                      charCount--;
-                  }
-              }
-              else if (buffer[i] == 6) { // micro-backspace
-                  // DOES NOT UPDATE CHARCOUNT!
-                  // THIS WILL CAUSE PROBLEMS WITH RETURN!
-                  // TODO: FIX THIS ISSUE
-                  micro_backspace();
-              }
-              else {
-                  send_letter(asciiTrans[buffer[i]]);
-                  charCount++;
+              if (bytesToPrint == 1) {
+                  // special case, just print the one letter, or return, or special movement, etc.
+                  charCount = printOne(buffer[bufferPos], charCount);
+                   
+              } else {
+                  // start printing loop
+                  charCount = printAllChars(buffer, bufferPos, bytesRead, bytesToPrint, charCount);
               }
           }
-          Serial.println(length); // return the number of characters printed
-          Bean.setLed(255, 0, 0);
-          Bean.sleep(50);
-          Bean.setLed(0,0,0); 
-      }
-      byte digital1 = digitalRead(d1);
-      if (digital1 == 0) {
-        forwardSpaces(5);
-        //fastText("this is really fast");
-        //send_letter(0b000000001); // 'a'
-        //send_letter(0b001011001); // 'b'
-        //send_letter(0b000000100); // 'm'
-        //send_letter();
-
-        //print_str("aaaaaaaaaaaa");
         
-        /*print_str("This is the symphony that schubert never finished!");
-        send_return(50);
-
-        print_str("\"the quick brown fox jumps over the lazy dog.\"");
-        send_return(46);*/
-
-        /*print_str("ABC");
-        send_return(3);
-
-        print_str("55555");
-        send_return(5);
-
-        print_str("1234567890");
-        send_return(10);
-        
-        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        send_return(26);
-
-        print_str("1234567890");
-        send_return(10);
-
-        print_str(",./?");
-        send_return(4);*/
-
-        //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-        //send_return(52);
-
-        //print_str("done.");
-        //send_return(5);
-
-        //print_strln("The quick brown fox jumps over the lazy dog.");
-        /*
-        sendByteOnPin(0b00000000);
-        delayMicroseconds(60);*/
-        /////////////
-        //PORTD &= 0b11111011;
-        Bean.setLed(255, 0, 0);
-        Bean.sleep(10);
-        Bean.setLed(0,0,0); 
+          byte digital1 = digitalRead(d1);
+          if (digital1 == 0) {
+            forwardSpaces(5);
+            //fastText("this is really fast");
+            //send_letter(0b000000001); // 'a'
+            //send_letter(0b001011001); // 'b'
+            //send_letter(0b000000100); // 'm'
+            //send_letter();
+    
+            //print_str("aaaaaaaaaaaa");
+            
+            /*print_str("This is the symphony that schubert never finished!");
+            send_return(50);
+    
+            print_str("\"the quick brown fox jumps over the lazy dog.\"");
+            send_return(46);*/
+    
+            /*print_str("ABC");
+            send_return(3);
+    
+            print_str("55555");
+            send_return(5);
+    
+            print_str("1234567890");
+            send_return(10);
+            
+            print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            send_return(26);
+    
+            print_str("1234567890");
+            send_return(10);
+    
+            print_str(",./?");
+            send_return(4);*/
+    
+            //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+            //send_return(52);
+    
+            //print_str("done.");
+            //send_return(5);
+    
+            //print_strln("The quick brown fox jumps over the lazy dog.");
+            /*
+            sendByteOnPin(0b00000000);
+            delayMicroseconds(60);*/
+            /////////////
+            //PORTD &= 0b11111011;
+            Bean.setLed(255, 0, 0);
+            Bean.sleep(10);
+            Bean.setLed(0,0,0); 
+          }
       }
       Bean.sleep(10);  
+}
+
+int printOne(char charToPrint, int charCount) {
+    // print the character, and return the number of chars on the line that are left.
+    // E.g., if we start with 6 and we print a character, then we return 7.
+    // But, if we print a return, then that clears the charCount to 0, and if we
+    // go left by one, that subtracts it, etc.
+
+    if (charToPrint == '\r' or charToPrint == '\n') {
+        send_return(charCount);
+        charCount = 0;
+    }
+    else if (charToPrint == 0 or charToPrint == 1 or
+             charToPrint == 4 or charToPrint == 21) {
+              // paper-up/down micro-down/micro-up
+              // ctrl-d is 4, ctrl-u is 21
+        paper_vert(charToPrint);
+    }
+    else if (charToPrint == 2 or charToPrint == 0x7f) { 
+        // left arrow or delete
+        if (charCount > 0) {
+            backspace_no_correct();
+            charCount--;
+        }
+    }
+    else if (charToPrint == 6) { // micro-backspace
+        // DOES NOT UPDATE CHARCOUNT!
+        // THIS WILL CAUSE PROBLEMS WITH RETURN!
+        // TODO: FIX THIS ISSUE
+        micro_backspace();
+    }
+    else {
+        send_letter(asciiTrans[charToPrint]);
+        charCount++;
+    }
+    
+    Serial.println(1); // sends back our characters (one) printed
+    Bean.setLed(255, 0, 0);
+    Bean.sleep(50);
+    Bean.setLed(0,0,0);
+    return charCount;
+}
+
+int printAllChars(char buffer[], 
+                  uint8_t bufferPos, 
+                  uint8_t bytesRead, 
+                  uint16_t bytesToPrint, 
+                  int charCount) {
+    uint8_t readLength = 65;
+    bool fastPrinting = false;
+    uint16_t bytesPrinted = 0;
+    while (bytesToPrint > 0) {
+        while (bufferPos < bytesRead) {
+          // print all the bytes
+          if (buffer[bufferPos] != '\r' and buffer[bufferPos] != '\n') {
+                // begin fast printing
+                if (!fastPrinting) {
+                    fastTextInit();
+                    fastPrinting = true;
+                }
+                fastTextChars(buffer + bufferPos, 1);
+                charCount++;
+          } else {
+            if (fastPrinting) {
+              fastTextFinish();
+              fastPrinting = false;
+            }
+            send_return(charCount);
+            charCount = 0;
+          }
+          bufferPos++;
+          bytesToPrint--;
+          bytesPrinted++;
+        }
+        // read more bytes
+        if (bytesToPrint > 0) {
+          Serial.println(bytesPrinted);
+          bytesPrinted = 0;
+          // wait for more bytes, but only wait up to 2 seconds
+          unsigned long startTime = millis();
+          bool timeout = false; 
+          while (Serial.available() == 0 and not timeout) {
+            if (millis() - startTime > 2000) {
+              timeout = true;
+            }
+            Bean.sleep(10);
+          }
+          if (timeout) {
+            if (fastPrinting) {
+              fastTextFinish();
+              fastPrinting = false;
+              send_return(charCount);
+              charCount = 0;
+            }
+            break;
+          }
+          bytesRead = Serial.readBytes(buffer, readLength-1);
+          bufferPos = 0;
+        }
+    }
+    if (fastPrinting) {
+      fastTextFinish();
+    }
+    Serial.println();
+    return charCount;
 }
 
 void print_str(char *s) {
@@ -503,7 +579,7 @@ void sendByte(int b) {
         }
         delayMicroseconds(5); // wait a bit before sending next char
 }
-void fastText(char *s) {
+void fastTextInit() {
     sendByte(0b100100001);
     sendByte(0b000001011);
     sendByte(0b100100001);
@@ -528,17 +604,11 @@ void fastText(char *s) {
     sendByte(0b100100001);
     sendByte(0b000000110);
     sendByte(0b010000000);
-    
-    // if odd, send 0:
-    /*if (strlen(s) % 2 == 1 or strlen(s) < 26) {
-        sendByte(0b000000000);
-    } else {
-        sendByte(0b000000101);
-    }*/
     sendByte(0b000000000);
-    
+}
+void fastTextChars(char *s, int length) {
     // letters start here
-    while (*s != '\0') {
+    for (int i=0; i < length; i++) {
         sendByte(0b100100001);
         sendByte(0b000000011);
     
@@ -546,25 +616,12 @@ void fastText(char *s) {
         
         sendByte(0b000001010);
     }
+}
 
+void fastTextFinish() {
     sendByte(0b100100001);
     sendByte(0b000001001);
     sendByte(0b000000000);
-    /*
-    sendByte(0b100100001);
-    sendByte(0b000001100);
-    sendByte(0b001000000);
-    sendByte(0b100100001);
-    sendByte(0b000001101);
-    sendByte(0b000000111);
-    sendByte(0b100100001);
-    sendByte(0b000000110);
-    sendByte(0b000000001);
-    sendByte(0b011110100);
-    sendByte(0b100100001);
-    sendByte(0b000000101);
-    sendByte(0b010010000);*/
-    //Serial.println("About to send bytes.");
     
     delay(LETTER_DELAY * 2); // a bit more time
 }
