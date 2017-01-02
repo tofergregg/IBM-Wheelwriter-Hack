@@ -98,7 +98,8 @@ void loop()
       // button for testing
       byte digital1 = digitalRead(d1);
       if (digital1 == 0) {
-        forwardSpaces(5);
+        paper_vert(1,100);
+        //forwardSpaces(5);
         //fastText("this is really fast");
         //send_letter(0b000000001); // 'a'
         //send_letter(0b001011001); // 'b'
@@ -160,11 +161,14 @@ int printOne(char charToPrint, int charCount) {
         send_return(charCount);
         charCount = 0;
     }
-    else if (charToPrint == 0 or charToPrint == 1 or
-             charToPrint == 4 or charToPrint == 21) {
-              // paper-up/down micro-down/micro-up
-              // ctrl-d is 4, ctrl-u is 21
-        paper_vert(charToPrint);
+    else if (charToPrint == 0 or charToPrint == 1) {
+        paper_vert(charToPrint,8); // full line up/down
+    }
+    else if (charToPrint == 4) { // micro-down, ctrl-d is 4
+        paper_vert(1,1);
+    }
+    else if (charToPrint == 21) { // micro-up, ctrl-u is 21
+        paper_vert(0,1);
     }
     else if (charToPrint == 2 or charToPrint == 0x7f) { 
         // left arrow or delete
@@ -177,7 +181,7 @@ int printOne(char charToPrint, int charCount) {
         // DOES NOT UPDATE CHARCOUNT!
         // THIS WILL CAUSE PROBLEMS WITH RETURN!
         // TODO: FIX THIS ISSUE
-        micro_backspace();
+        micro_backspace(1);
     }
     else {
         send_letter(asciiTrans[charToPrint]);
@@ -408,6 +412,16 @@ void send_letter(int letter) {
     delay(LETTER_DELAY); // before next character
 }
 
+void letterNoSpace(int letter) {
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000000011);
+    sendByte(letter);
+    sendByte(0); // don't send any spaces
+    delay(LETTER_DELAY); // before next character
+}
+
 void paper_vert(int direction) {
   // 0 == up
   // 1 == down
@@ -430,6 +444,20 @@ void paper_vert(int direction) {
   sendByte(0b000001011);
   
   delay(LETTER_DELAY * 2); // give it a bit more time
+}
+
+void paper_vert(int direction, int microspaces) {
+    // 0 == up
+    // 1 == down
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000000101);
+    sendByte((direction << 7) | (microspaces << 1));
+    
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    delay(LETTER_DELAY * microspaces/5);
 }
 
 void backspace_no_correct() {
@@ -524,7 +552,8 @@ void correct_letter(int letter) {
     sendByte(0b010010000);
 }
 
-void micro_backspace() {
+void micro_backspace(int microspaces) {
+    // 5 microspaces is one space
     sendByte(0b100100001);
     sendByte(0b000001110);
     sendByte(0b011010000);
@@ -536,7 +565,8 @@ void micro_backspace() {
     sendByte(0b100100001);
     sendByte(0b000000110);
     sendByte(0b000000000);
-    sendByte(0b000000010);
+    sendByte(microspaces << 1);
+    //sendByte(0b000000010);
     /*
     sendByte(0b100100001);
     
@@ -546,7 +576,8 @@ void micro_backspace() {
     sendByteOnPin(0b000001011);*/
 }
 
-void forwardSpaces(int num_spaces) {
+void forwardSpaces(int num_microspaces) {
+    // five microspaces is one real space
     sendByte(0b100100001);
     sendByte(0b000001110);
     sendByte(0b010010110);
@@ -560,7 +591,7 @@ void forwardSpaces(int num_spaces) {
     
     sendByte(0b010000000);
     //sendByte(0b001111100);
-    sendByte(0b000000010);
+    sendByte(num_microspaces << 1);
 }
 
 void spin() {
