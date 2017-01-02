@@ -76,9 +76,9 @@ void loop()
       if (Serial.available() > 0) {
           // read up to readLength bytes
           bytesRead = Serial.readBytes(buffer, readLength-1 );
-          Serial.print("Read ");
-          Serial.print(bytesRead);
-          Serial.println(" bytes.");
+          //Serial.print("Read ");
+          Serial.println(bytesRead);
+          //Serial.println(" bytes.");
 
           // if we get less than three bytes, we don't have a proper transmission
           if (bytesRead >= 3) {
@@ -184,7 +184,7 @@ int printOne(char charToPrint, int charCount) {
         charCount++;
     }
     
-    Serial.println(1); // sends back our characters (one) printed
+    Serial.println("ok"); // sends back our characters (one) printed
     Bean.setLed(255, 0, 0);
     Bean.sleep(50);
     Bean.setLed(0,0,0);
@@ -224,7 +224,7 @@ int printAllChars(char buffer[],
         }
         // read more bytes
         if (bytesToPrint > 0) {
-          Serial.println(bytesPrinted);
+          Serial.println("ok");
           bytesPrinted = 0;
           // wait for more bytes, but only wait up to 2 seconds
           unsigned long startTime = millis();

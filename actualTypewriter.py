@@ -34,14 +34,14 @@ if __name__ == "__main__":
             else:
                 screen.addch(event)
             #screen.addstr(str(event))
-            ser.write(chr(event))
-            written = ''
+            ser.write(chr(1) + chr(0) + chr(event)) # send one byte
+            response=''
             while True:
-                written += ser.read() # read one character 
-                if len(written) > 0 and written[-1] == '\n':
-                    written = ''
+                response += ser.read(10)
+                if len(response) > 0 and 'ok' in response:
+                    #print("(bytes written:"+response.rstrip()+")")
                     break
-            #time.sleep(0.25)
+                time.sleep(0.1)
     finally:
         curses.endwin()
         ser.close()
