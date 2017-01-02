@@ -94,58 +94,58 @@ void loop()
                   charCount = printAllChars(buffer, bufferPos, bytesRead, bytesToPrint, charCount);
               }
           }
+      }
+      // button for testing
+      byte digital1 = digitalRead(d1);
+      if (digital1 == 0) {
+        forwardSpaces(5);
+        //fastText("this is really fast");
+        //send_letter(0b000000001); // 'a'
+        //send_letter(0b001011001); // 'b'
+        //send_letter(0b000000100); // 'm'
+        //send_letter();
+
+        //print_str("aaaaaaaaaaaa");
         
-          byte digital1 = digitalRead(d1);
-          if (digital1 == 0) {
-            forwardSpaces(5);
-            //fastText("this is really fast");
-            //send_letter(0b000000001); // 'a'
-            //send_letter(0b001011001); // 'b'
-            //send_letter(0b000000100); // 'm'
-            //send_letter();
-    
-            //print_str("aaaaaaaaaaaa");
-            
-            /*print_str("This is the symphony that schubert never finished!");
-            send_return(50);
-    
-            print_str("\"the quick brown fox jumps over the lazy dog.\"");
-            send_return(46);*/
-    
-            /*print_str("ABC");
-            send_return(3);
-    
-            print_str("55555");
-            send_return(5);
-    
-            print_str("1234567890");
-            send_return(10);
-            
-            print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-            send_return(26);
-    
-            print_str("1234567890");
-            send_return(10);
-    
-            print_str(",./?");
-            send_return(4);*/
-    
-            //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-            //send_return(52);
-    
-            //print_str("done.");
-            //send_return(5);
-    
-            //print_strln("The quick brown fox jumps over the lazy dog.");
-            /*
-            sendByteOnPin(0b00000000);
-            delayMicroseconds(60);*/
-            /////////////
-            //PORTD &= 0b11111011;
-            Bean.setLed(255, 0, 0);
-            Bean.sleep(10);
-            Bean.setLed(0,0,0); 
-          }
+        /*print_str("This is the symphony that schubert never finished!");
+        send_return(50);
+
+        print_str("\"the quick brown fox jumps over the lazy dog.\"");
+        send_return(46);*/
+
+        /*print_str("ABC");
+        send_return(3);
+
+        print_str("55555");
+        send_return(5);
+
+        print_str("1234567890");
+        send_return(10);
+        
+        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+        send_return(26);
+
+        print_str("1234567890");
+        send_return(10);
+
+        print_str(",./?");
+        send_return(4);*/
+
+        //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+        //send_return(52);
+
+        //print_str("done.");
+        //send_return(5);
+
+        //print_strln("The quick brown fox jumps over the lazy dog.");
+        /*
+        sendByteOnPin(0b00000000);
+        delayMicroseconds(60);*/
+        /////////////
+        //PORTD &= 0b11111011;
+        Bean.setLed(255, 0, 0);
+        Bean.sleep(10);
+        Bean.setLed(0,0,0); 
       }
       Bean.sleep(10);  
 }
@@ -405,8 +405,6 @@ void send_letter(int letter) {
     sendByte(0b000000011);
     sendByte(letter);
     sendByte(0b000001010);
-    
-
     delay(LETTER_DELAY); // before next character
 }
 
@@ -444,12 +442,12 @@ void backspace_no_correct() {
     sendByte(0b000000110);
     sendByte(0b000000000);
     sendByte(0b000001010);
-    sendByte(0b100100001);
+    /*sendByte(0b100100001);
     
   
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
-    sendByteOnPin(0b000001011);
+    sendByteOnPin(0b000001011);*/
     delay(LETTER_DELAY * 2); // a bit more time
 }
 
@@ -493,13 +491,15 @@ void send_return(int numChars) {
     }
     
     sendByte(0b000000101);
-    sendByte(0b010010000); //
+    sendByte(0b010010000);
+
+    /*
     sendByte(0b100100001);
     
 
     // send one more byte but don't wait explicitly for the response
     // of 0b001010000
-    sendByteOnPin(0b000001011);
+    sendByteOnPin(0b000001011);*/
 
     // wait for carriage 
     delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
@@ -537,12 +537,13 @@ void micro_backspace() {
     sendByte(0b000000110);
     sendByte(0b000000000);
     sendByte(0b000000010);
+    /*
     sendByte(0b100100001);
     
 
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
-    sendByteOnPin(0b000001011);
+    sendByteOnPin(0b000001011);*/
 }
 
 void forwardSpaces(int num_spaces) {
@@ -557,12 +558,17 @@ void forwardSpaces(int num_spaces) {
     sendByte(0b100100001);
     sendByte(0b000000110);
     
-    //sendByte(0b010000001);
     sendByte(0b010000000);
-     
-    sendByte(0b001111100);
+    //sendByte(0b001111100);
+    sendByte(0b000000010);
+}
+
+void spin() {
     sendByte(0b100100001);
     sendByte(0b000000111);
+}
+
+void unknownCommand() {
     sendByte(0b100100001);
     sendByte(0b000001001);
     sendByte(0b010000000);
