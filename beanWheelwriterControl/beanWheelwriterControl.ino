@@ -74,25 +74,26 @@ void loop()
       uint16_t bytesToPrint; 
 
       if (Serial.available() > 0) {
-          // read up to readLength bytes
-          bytesRead = Serial.readBytes(buffer, readLength-1 );
+          // read one byte, and see if it is a command
+          // Commands:
+          // 0: next two bytes will be the number of characters we are going
+          //    to send
+          // 1: TBD
+          // 2: TBD
+          // 3: TBD
+          // If the byte is >= 4, just treat as one character
+          bytesRead = Serial.readBytes(buffer, 1);
           //Serial.print("Read ");
           Serial.println(bytesRead);
           //Serial.println(" bytes.");
-
-          // if we get less than three bytes, we don't have a proper transmission
-          if (bytesRead >= 3) {
-              bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
-              bufferPos = 2; // we read two bytes already
-    
-              if (bytesToPrint == 1) {
-                  // special case, just print the one letter, or return, or special movement, etc.
-                  charCount = printOne(buffer[bufferPos], charCount);
-                   
-              } else {
-                  // start printing loop
-                  charCount = printAllChars(buffer, bufferPos, bytesRead, bytesToPrint, charCount);
-              }
+          char command = buffer[0];
+          if (command == 0) {
+            // look for next two bytes
+            Serial.readBytes(buffer,2);
+            bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
+            charCount = printAllChars(buffer,bytesToPrint,charCount);
+          } else {
+            charCount = printOne(command,charCount);
           }
       }
       // button for testing
@@ -151,18 +152,23 @@ void loop()
       Bean.sleep(10);  
 }
 
-int printOne(char charToPrint, int charCount) {
+int printOne(int charToPrint, int charCount) {
     // print the character, and return the number of chars on the line that are left.
     // E.g., if we start with 6 and we print a character, then we return 7.
     // But, if we print a return, then that clears the charCount to 0, and if we
     // go left by one, that subtracts it, etc.
 
+    if (charToPrint < 0) {
+      charToPrint += 256; // correct for signed char
+      Serial.println(int(charToPrint));
+    }
+
     if (charToPrint == '\r' or charToPrint == '\n') {
         send_return(charCount);
         charCount = 0;
     }
-    else if (charToPrint == 0 or charToPrint == 1) {
-        paper_vert(charToPrint,8); // full line up/down
+    else if (charToPrint == 128 or charToPrint == 129) {
+        paper_vert((charToPrint == 128 ? 0 : 1),8); // full line up/down
     }
     else if (charToPrint == 4) { // micro-down, ctrl-d is 4
         paper_vert(1,1);
@@ -170,14 +176,14 @@ int printOne(char charToPrint, int charCount) {
     else if (charToPrint == 21) { // micro-up, ctrl-u is 21
         paper_vert(0,1);
     }
-    else if (charToPrint == 2 or charToPrint == 0x7f) { 
+    else if (charToPrint == 130 or charToPrint == 0x7f) { 
         // left arrow or delete
         if (charCount > 0) {
             backspace_no_correct();
             charCount--;
         }
     }
-    else if (charToPrint == 6) { // micro-backspace
+    else if (charToPrint == 131) { // micro-backspace
         // DOES NOT UPDATE CHARCOUNT!
         // THIS WILL CAUSE PROBLEMS WITH RETURN!
         // TODO: FIX THIS ISSUE
@@ -196,14 +202,38 @@ int printOne(char charToPrint, int charCount) {
 }
 
 int printAllChars(char buffer[], 
-                  uint8_t bufferPos, 
-                  uint8_t bytesRead, 
                   uint16_t bytesToPrint, 
                   int charCount) {
     uint8_t readLength = 65;
     bool fastPrinting = false;
     uint16_t bytesPrinted = 0;
+    uint8_t bufferPos = 0;
+    uint8_t bytesRead = 0;
+    
     while (bytesToPrint > 0) {
+        // read bytes from serial
+        bytesPrinted = 0;
+        // wait for more bytes, but only wait up to 2 seconds
+        unsigned long startTime = millis();
+        bool timeout = false; 
+        while (Serial.available() == 0 and not timeout) {
+          if (millis() - startTime > 2000) {
+            timeout = true;
+          }
+          Bean.sleep(10);
+        }
+        if (timeout) {
+          if (fastPrinting) {
+            fastTextFinish();
+            fastPrinting = false;
+            send_return(charCount);
+            charCount = 0;
+          }
+          break;
+        }
+        bytesRead = Serial.readBytes(buffer, readLength-1);
+        Serial.println(bytesRead);
+        bufferPos = 0;
         while (bufferPos < bytesRead) {
           // print all the bytes
           if (buffer[bufferPos] != '\r' and buffer[bufferPos] != '\n') {
@@ -225,31 +255,6 @@ int printAllChars(char buffer[],
           bufferPos++;
           bytesToPrint--;
           bytesPrinted++;
-        }
-        // read more bytes
-        if (bytesToPrint > 0) {
-          Serial.println("ok");
-          bytesPrinted = 0;
-          // wait for more bytes, but only wait up to 2 seconds
-          unsigned long startTime = millis();
-          bool timeout = false; 
-          while (Serial.available() == 0 and not timeout) {
-            if (millis() - startTime > 2000) {
-              timeout = true;
-            }
-            Bean.sleep(10);
-          }
-          if (timeout) {
-            if (fastPrinting) {
-              fastTextFinish();
-              fastPrinting = false;
-              send_return(charCount);
-              charCount = 0;
-            }
-            break;
-          }
-          bytesRead = Serial.readBytes(buffer, readLength-1);
-          bufferPos = 0;
         }
     }
     if (fastPrinting) {

@@ -22,7 +22,7 @@ fileLen = os.path.getsize(filePath)
 
 # first two bytes are the file length (max: 65K)
 # sent in little-endian format
-stringHeader = chr(fileLen & 0xff) + chr(fileLen >> 8)
+stringHeader = chr(0x00) + chr(fileLen & 0xff) + chr(fileLen >> 8)
 try:
     with open(filePath,"r") as f:
         # read MAXLINE characters at a time and send

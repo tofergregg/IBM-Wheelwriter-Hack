@@ -18,13 +18,13 @@ if __name__ == "__main__":
         while True:
             event = screen.getch()
             if event == curses.KEY_UP:
-                event = 0 # special char for typewriter
+                event = 128 # special char for typewriter
             elif event == curses.KEY_DOWN:
-                event = 1
+                event = 129 
             elif event == curses.KEY_LEFT:
-                event = 2
+                event = 130 
             elif event == curses.KEY_RIGHT:
-                event = 3
+                event = 32 # space 
             elif event == curses.KEY_BACKSPACE:
                 event = 0x7f
             elif event == 0x7f: # already backspace
@@ -33,8 +33,8 @@ if __name__ == "__main__":
                 event = 6 # what the Arduino is expecting
             else:
                 screen.addch(event)
-            #screen.addstr(str(event))
-            ser.write(chr(1) + chr(0) + chr(event)) # send one byte
+            #screen.addstr(str(type(event)))
+            ser.write(chr(event)) # send one byte
             response=''
             while True:
                 response += ser.read(10)
