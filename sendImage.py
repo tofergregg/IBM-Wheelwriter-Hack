@@ -66,25 +66,23 @@ for r in range(0,im2.height*3,3):
     runs.append((1,0,'\n'))
 
 runs.append((0,0,0)) # signal to end the image printing
-print runs
-quit()
+#print runs
+
 ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.1)
 # wait a bit
 time.sleep(0.5)
 
-stringHeader = chr(0x01) + chr(im2.width) + chr(im2.height)
+stringHeader = chr(0x01)
 
 try:
     ser.write(stringHeader)
 
     # send MAXLINE characters at a time 
     while len(bits) > 0: 
-        chunk = bits[:MAXLINE]
-        bits = bits[MAXLINE:]
-        if (chunk == ''):
-            break
-        ser.write(chunk)
-        print("Sent "+str(len(chunk))+" bits")
+        run = bits[0]
+        bits = bits[1:]
+        ser.write(''.join([chr(x) for x in run]))
+        print("Sent "+str(run))
         response = ""
         while True:
             response += ser.read(10)
