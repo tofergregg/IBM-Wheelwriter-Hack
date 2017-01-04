@@ -33,7 +33,7 @@ im2.show()
 # char to print will normally be a period (.) or a space ( ) but will eventually
 # include an underscore (_) for faster printing
 
-runs = []
+runs = [(1,0,0)]
 for r in range(0,im2.height*3,3):
     prevBit = ord(b2[r * im2.width])
     bitCount = 0
@@ -65,6 +65,7 @@ for r in range(0,im2.height*3,3):
     #sys.stdout.write('\n')
     runs.append((1,0,'\n'))
 
+runs.append((0,0,0)) # signal to end the image printing
 print runs
 quit()
 ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.1)

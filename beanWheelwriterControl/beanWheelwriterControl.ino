@@ -87,17 +87,15 @@ void loop()
          // Serial.println(bytesRead);
           //Serial.println(" bytes.");
           char command = buffer[0];
-          if (command == 0) {
+          if (command == 0) { // text to print
             // look for next two bytes
             Serial.readBytes(buffer,2);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             charCount = printAllChars(buffer,bytesToPrint,charCount);
           }
-          else if (command == 1) {
-            Serial.readBytes(buffer,2);
-            int width = buffer[0];
-            int height = buffer[1];
-            printImage(buffer, width, height);
+          else if (command == 1) { // image to print
+            Serial.println("ok");
+            printImage(buffer);
           } else {
             charCount = printOne(command,charCount);
           }
@@ -272,18 +270,16 @@ int printAllChars(char buffer[],
     return charCount;
 }
 
-void printImage(char buffer[], 
-                  uint16_t width, uint16_t height) {
-    uint32_t bitsToPrint = width * height;
-    uint8_t readLength = 65;
-    uint16_t bitsPrinted = 0;
-    uint8_t bufferPos = 0;
-    uint8_t bitsRead = 0;
-    uint16_t colCount = 0;
+void printImage(char *buffer) {
+    // will read 3-tuples of bytes
+    // first byte is low-order byte for run length,
+    // second byte is high-order byte for run length,
+    // third byte is the byte to print (typically, period, space, or return)
+    uint32_t rowBitsPrinted = 0;
+    int bitsRead = 0;
     
-    while (bitsToPrint > 0) {
+    while (1) { // keep reading bytes until we get (0,0,0)
         // read bytes from serial
-        bitsPrinted = 0;
         // wait for more bytes, but only wait up to 2 seconds
         unsigned long startTime = millis();
         bool timeout = false; 
@@ -295,35 +291,31 @@ void printImage(char buffer[],
         }
         if (timeout) {
             paper_vert(1,1);
-            micro_backspace(width);
+            micro_backspace(rowBitsPrinted);
             break;
         }
-        bitsRead = Serial.readBytes(buffer, readLength-1);
-        Serial.println(bitsRead);
-        bufferPos = 0;
-        while (bufferPos < bitsRead) {
-          // print all the bytes
-          printBit(buffer[bufferPos]);
-          colCount++;
-          if (colCount == width) {
-            paper_vert(1,1);
-            micro_backspace(width);
-            colCount = 0;
-          }
-          bufferPos++;
-          bitsToPrint--;
-          bitsPrinted++;
+        bitsRead = Serial.readBytes(buffer, 3);
+        Serial.println(bitsRead); // should always be 3
+        if (buffer[0] == 0 and buffer[1] == 0 and buffer[2] == 0) {
+          break; // no more bits to print
         }
+        // we do have a run to print
+        uint16_t runLength = buffer[0] + (buffer[1] << 8);
+        printRun(runLength,buffer[2]);
     }
     Serial.println();
 }
 
-void printBit(char bit) {
-    if (bit == 1) {
-      letterMicrospace(asciiTrans['.']);
+void printRun(uint16_t runLength, char c) {
+    if (c == '\n') {
+      paper_vert(runLength,1);
     }
-    else {
-      letterMicrospace(asciiTrans[' ']);
+    else if (c == ' ') {
+      // print a run of spaces
+      forwardSpaces(runLength);
+    } else {
+      fastTextInit();
+      fastTextCharsMicro(c,runLength);
     }
 }
 
@@ -732,6 +724,18 @@ void fastTextChars(char *s, int length) {
         sendByte(asciiTrans[*s++]);
         
         sendByte(0b000001010);
+    }
+}
+
+void fastTextCharsMicro(char s, uint16_t length) {
+    // letters start here
+    for (uint16_t i=0; i < length; i++) {
+        sendByte(0b100100001);
+        sendByte(0b000000011);
+    
+        sendByte(asciiTrans[s]);
+        
+        sendByte(0b000000010); // 1 microspace
     }
 }
 
