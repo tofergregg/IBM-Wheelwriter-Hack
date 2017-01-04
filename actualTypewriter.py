@@ -30,7 +30,7 @@ if __name__ == "__main__":
             elif event == 0x7f: # already backspace
                 pass
             elif event == 393: # shift left-arrow for micro-backspace
-                event = 6 # what the Arduino is expecting
+                event = 131 
             else:
                 screen.addch(event)
             #screen.addstr(str(type(event)))

@@ -78,13 +78,13 @@ void loop()
           // Commands:
           // 0: next two bytes will be the number of characters we are going
           //    to send
-          // 1: TBD
+          // 1: image bits (next two bytes will be the width and height)
           // 2: TBD
           // 3: TBD
           // If the byte is >= 4, just treat as one character
           bytesRead = Serial.readBytes(buffer, 1);
           //Serial.print("Read ");
-          Serial.println(bytesRead);
+         // Serial.println(bytesRead);
           //Serial.println(" bytes.");
           char command = buffer[0];
           if (command == 0) {
@@ -92,6 +92,12 @@ void loop()
             Serial.readBytes(buffer,2);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             charCount = printAllChars(buffer,bytesToPrint,charCount);
+          }
+          else if (command == 1) {
+            Serial.readBytes(buffer,2);
+            int width = buffer[0];
+            int height = buffer[1];
+            printImage(buffer, width, height);
           } else {
             charCount = printOne(command,charCount);
           }
@@ -99,7 +105,9 @@ void loop()
       // button for testing
       byte digital1 = digitalRead(d1);
       if (digital1 == 0) {
-        paper_vert(1,100);
+        paper_vert(1,1);
+        micro_backspace(25);
+        //paper_vert(1,100);
         //forwardSpaces(5);
         //fastText("this is really fast");
         //send_letter(0b000000001); // 'a'
@@ -262,6 +270,61 @@ int printAllChars(char buffer[],
     }
     Serial.println();
     return charCount;
+}
+
+void printImage(char buffer[], 
+                  uint16_t width, uint16_t height) {
+    uint32_t bitsToPrint = width * height;
+    uint8_t readLength = 65;
+    uint16_t bitsPrinted = 0;
+    uint8_t bufferPos = 0;
+    uint8_t bitsRead = 0;
+    uint16_t colCount = 0;
+    
+    while (bitsToPrint > 0) {
+        // read bytes from serial
+        bitsPrinted = 0;
+        // wait for more bytes, but only wait up to 2 seconds
+        unsigned long startTime = millis();
+        bool timeout = false; 
+        while (Serial.available() == 0 and not timeout) {
+          if (millis() - startTime > 2000) {
+            timeout = true;
+          }
+          Bean.sleep(10);
+        }
+        if (timeout) {
+            paper_vert(1,1);
+            micro_backspace(width);
+            break;
+        }
+        bitsRead = Serial.readBytes(buffer, readLength-1);
+        Serial.println(bitsRead);
+        bufferPos = 0;
+        while (bufferPos < bitsRead) {
+          // print all the bytes
+          printBit(buffer[bufferPos]);
+          colCount++;
+          if (colCount == width) {
+            paper_vert(1,1);
+            micro_backspace(width);
+            colCount = 0;
+          }
+          bufferPos++;
+          bitsToPrint--;
+          bitsPrinted++;
+        }
+    }
+    Serial.println();
+}
+
+void printBit(char bit) {
+    if (bit == 1) {
+      letterMicrospace(asciiTrans['.']);
+    }
+    else {
+      letterMicrospace(asciiTrans[' ']);
+    }
 }
 
 void print_str(char *s) {
@@ -427,6 +490,16 @@ void letterNoSpace(int letter) {
     delay(LETTER_DELAY); // before next character
 }
 
+void letterMicrospace(int letter) {
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000000011);
+    sendByte(letter);
+    sendByte(2); // send one microspace
+    delay(LETTER_DELAY); // before next character
+}
+
 void paper_vert(int direction) {
   // 0 == up
   // 1 == down
@@ -462,7 +535,7 @@ void paper_vert(int direction, int microspaces) {
     
     sendByte(0b100100001);
     sendByte(0b000001011);
-    delay(LETTER_DELAY * microspaces/5);
+    delay(LETTER_DELAY + LETTER_DELAY * microspaces/5);
 }
 
 void backspace_no_correct() {
@@ -571,6 +644,7 @@ void micro_backspace(int microspaces) {
     sendByte(0b000000110);
     sendByte(0b000000000);
     sendByte(microspaces << 1);
+    delay(LETTER_DELAY + LETTER_DELAY * microspaces / 5);
     //sendByte(0b000000010);
     /*
     sendByte(0b100100001);
@@ -597,6 +671,7 @@ void forwardSpaces(int num_microspaces) {
     sendByte(0b010000000);
     //sendByte(0b001111100);
     sendByte(num_microspaces << 1);
+    delay(LETTER_DELAY);
 }
 
 void spin() {
