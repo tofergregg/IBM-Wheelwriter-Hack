@@ -26,7 +26,7 @@ for idx,byte in enumerate(b):
         b2 += chr(255)
 
 im2 = Image.frombytes('RGB',(im.width,im.height),b2)
-im2.show()
+#im2.show()
 
 # convert to run-length encoded stream
 # Format for bytes: (number of bits low byte)(number of bits high byte)(char to print)
@@ -37,16 +37,18 @@ runs = [(1,0,0)]
 for r in range(0,im2.height*3,3):
     prevBit = ord(b2[r * im2.width])
     bitCount = 0
+    lineBits = 0
     for c in range(0,im2.width*3,3):
         currentBit = ord(b2[r * im2.width + c])
         if currentBit != prevBit:
             #sys.stdout.write(str(bitCount))
             if prevBit == 0:
                 #sys.stdout.write('.')
-                runs.append((bitCount & 0xff, bitCount >> 8, '.'))
+                runs.append((bitCount & 0xff, bitCount >> 8, ord('.')))
             else:
                 #sys.stdout.write('x')
-                runs.append((bitCount & 0xff, bitCount >> 8,' '))
+                runs.append((bitCount & 0xff, bitCount >> 8,ord(' ')))
+            lineBits += bitCount
             bitCount = 0
             prevBit = currentBit
         bitCount+=1
@@ -61,9 +63,10 @@ for r in range(0,im2.height*3,3):
     if prevBit == 0: # 0 means black
         # don't bother printing a string of spaces at the end, just 1s
         #sys.stdout.write(str(bitCount)+'.')
-        runs.append((bitCount & 0xff, bitCount >> 8,'.'))
+        runs.append((bitCount & 0xff, bitCount >> 8,ord('.')))
+        lineBits += bitCount
     #sys.stdout.write('\n')
-    runs.append((1,0,'\n'))
+    runs.append((lineBits & 0xff,lineBits >> 8,ord('\n')))
 
 runs.append((0,0,0)) # signal to end the image printing
 #print runs
@@ -77,10 +80,9 @@ stringHeader = chr(0x01)
 try:
     ser.write(stringHeader)
 
-    # send MAXLINE characters at a time 
-    while len(bits) > 0: 
-        run = bits[0]
-        bits = bits[1:]
+    while len(runs) > 0: 
+        run = runs[0]
+        runs = runs[1:]
         ser.write(''.join([chr(x) for x in run]))
         print("Sent "+str(run))
         response = ""

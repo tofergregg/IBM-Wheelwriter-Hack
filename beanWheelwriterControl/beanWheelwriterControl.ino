@@ -308,7 +308,8 @@ void printImage(char *buffer) {
 
 void printRun(uint16_t runLength, char c) {
     if (c == '\n') {
-      paper_vert(runLength,1);
+      paper_vert(1,1); // Move down one pixel
+      micro_backspace(runLength);
     }
     else if (c == ' ') {
       // print a run of spaces
@@ -636,7 +637,7 @@ void micro_backspace(int microspaces) {
     sendByte(0b000000110);
     sendByte(0b000000000);
     sendByte(microspaces << 1);
-    delay(LETTER_DELAY + LETTER_DELAY * microspaces / 5);
+    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * microspaces / 5);
     //sendByte(0b000000010);
     /*
     sendByte(0b100100001);
@@ -663,7 +664,7 @@ void forwardSpaces(int num_microspaces) {
     sendByte(0b010000000);
     //sendByte(0b001111100);
     sendByte(num_microspaces << 1);
-    delay(LETTER_DELAY);
+    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * num_microspaces / 5);
 }
 
 void spin() {
@@ -737,6 +738,7 @@ void fastTextCharsMicro(char s, uint16_t length) {
         
         sendByte(0b000000010); // 1 microspace
     }
+    delay(LETTER_DELAY + LETTER_DELAY * length / 5);
 }
 
 void fastTextFinish() {
