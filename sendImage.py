@@ -8,7 +8,7 @@ import math
 import os
 import serial
 
-MAXLINE = 60
+MAXWIDTH = 50
 
 if len(sys.argv) != 2:
     print("Usage:\n\t./sendImage image")
@@ -16,6 +16,11 @@ if len(sys.argv) != 2:
 im = Image.open(sys.argv[1])
 im = im.convert('RGB')
 
+# resize to at most MAXWIDTH  wide
+if im.width > MAXWIDTH:
+    wpercent = (MAXWIDTH/float(im.width))
+    hsize = int((float(im.height)*float(wpercent)))
+    im = im.resize((MAXWIDTH,hsize), Image.ANTIALIAS)
 b = im.tobytes()
 
 b2 = ''
@@ -26,7 +31,7 @@ for idx,byte in enumerate(b):
         b2 += chr(255)
 
 im2 = Image.frombytes('RGB',(im.width,im.height),b2)
-#im2.show()
+im2.show()
 
 # convert to run-length encoded stream
 # Format for bytes: (number of bits low byte)(number of bits high byte)(char to print)
