@@ -39,7 +39,7 @@ if __name__ == "__main__":
             response=''
             while True:
                 response = ser.read(10)
-                print(response)
+                #print(response)
                 if len(response) > 0 and 'ok' in response:
                     #print("(bytes written:"+response.rstrip()+")")
                     break

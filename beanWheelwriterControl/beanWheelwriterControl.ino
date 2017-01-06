@@ -203,7 +203,7 @@ int printOne(int charToPrint, int charCount) {
     Serial.println("ok"); // sends back our characters (one) printed
     Serial.flush();
     Bean.setLed(255, 0, 0);
-    Bean.sleep(50);
+    Bean.sleep(10);
     Bean.setLed(0,0,0);
     return charCount;
 }
