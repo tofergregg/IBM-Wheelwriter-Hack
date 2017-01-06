@@ -8,7 +8,7 @@ import math
 import os
 import serial
 
-MAXWIDTH = 50
+MAXWIDTH = 500
 
 if len(sys.argv) != 2:
     print("Usage:\n\t./sendImage image")
@@ -75,6 +75,7 @@ for r in range(0,im2.height*3,3):
 
 runs.append((0,0,0)) # signal to end the image printing
 #print runs
+#quit()
 
 ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.1)
 # wait a bit
@@ -94,10 +95,13 @@ try:
         while True:
             response += ser.read(10)
             print(response)
-            if len(response) > 0 and response[-1] == '\n':
+            if len(response) > 0 and '\n' in response:
                 #print("(bytes written:"+response.rstrip()+")")
                 break
-            time.sleep(0.1)
+            time.sleep(0.01)
+        if "timeout" in response or "done" in response:
+            print response
+            break
 except KeyboardInterrupt:
     pass
 ser.close()

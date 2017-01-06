@@ -4,7 +4,7 @@ import curses,serial,time
 
 if __name__ == "__main__":
     # setup serial
-    ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.05)
+    ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.1)
     
     # wait a bit
     time.sleep(0.5)
@@ -35,13 +35,15 @@ if __name__ == "__main__":
                 screen.addch(event)
             #screen.addstr(str(type(event)))
             ser.write(chr(event)) # send one byte
+            ser.flush()
             response=''
             while True:
-                response += ser.read(10)
+                response = ser.read(10)
+                print(response)
                 if len(response) > 0 and 'ok' in response:
                     #print("(bytes written:"+response.rstrip()+")")
                     break
-                time.sleep(0.1)
+                time.sleep(0.01)
     finally:
         curses.endwin()
         ser.close()

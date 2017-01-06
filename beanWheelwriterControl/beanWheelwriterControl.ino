@@ -94,7 +94,7 @@ void loop()
             charCount = printAllChars(buffer,bytesToPrint,charCount);
           }
           else if (command == 1) { // image to print
-            Serial.println("ok");
+            Serial.println("image");
             printImage(buffer);
           } else {
             charCount = printOne(command,charCount);
@@ -166,7 +166,6 @@ int printOne(int charToPrint, int charCount) {
 
     if (charToPrint < 0) {
       charToPrint += 256; // correct for signed char
-      Serial.println(int(charToPrint));
     }
 
     if (charToPrint == '\r' or charToPrint == '\n') {
@@ -196,11 +195,13 @@ int printOne(int charToPrint, int charCount) {
         micro_backspace(1);
     }
     else {
+        //Serial.println("about to print");
         send_letter(asciiTrans[charToPrint]);
         charCount++;
     }
     
     Serial.println("ok"); // sends back our characters (one) printed
+    Serial.flush();
     Bean.setLed(255, 0, 0);
     Bean.sleep(50);
     Bean.setLed(0,0,0);
@@ -219,14 +220,14 @@ int printAllChars(char buffer[],
     while (bytesToPrint > 0) {
         // read bytes from serial
         bytesPrinted = 0;
-        // wait for more bytes, but only wait up to 2 seconds
+        // wait for more bytes, but only wait up to 20 seconds (bluetooth issues??)
         unsigned long startTime = millis();
         bool timeout = false; 
         while (Serial.available() == 0 and not timeout) {
-          if (millis() - startTime > 2000) {
+          if (millis() - startTime > 20000) {
             timeout = true;
           }
-          Bean.sleep(10);
+          //Bean.sleep(10);
         }
         if (timeout) {
           if (fastPrinting) {
@@ -291,25 +292,29 @@ void printImage(char *buffer) {
         }
         if (timeout) {
             paper_vert(1,1);
+            Serial.println("timeout");
             micro_backspace(rowBitsPrinted);
             break;
         }
         bitsRead = Serial.readBytes(buffer, 3);
         Serial.println(bitsRead); // should always be 3
         if (buffer[0] == 0 and buffer[1] == 0 and buffer[2] == 0) {
+          Serial.println("end received");
           break; // no more bits to print
         }
         // we do have a run to print
         uint16_t runLength = buffer[0] + (buffer[1] << 8);
         printRun(runLength,buffer[2]);
     }
-    Serial.println();
+    Serial.println("done");
 }
 
 void printRun(uint16_t runLength, char c) {
     if (c == '\n') {
       paper_vert(1,1); // Move down one pixel
-      micro_backspace(runLength);
+      if (runLength > 0) {
+          micro_backspace(runLength);
+      }
     }
     else if (c == ' ') {
       // print a run of spaces
@@ -470,7 +475,7 @@ void send_letter(int letter) {
     sendByte(0b000000011);
     sendByte(letter);
     sendByte(0b000001010);
-    delay(LETTER_DELAY); // before next character
+    //delay(LETTER_DELAY); // before next character
 }
 
 void letterNoSpace(int letter) {
@@ -664,7 +669,7 @@ void forwardSpaces(int num_microspaces) {
     sendByte(0b010000000);
     //sendByte(0b001111100);
     sendByte(num_microspaces << 1);
-    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * num_microspaces / 5);
+    delay(2 * LETTER_DELAY + LETTER_DELAY * num_microspaces / 5);
 }
 
 void spin() {
@@ -738,7 +743,7 @@ void fastTextCharsMicro(char s, uint16_t length) {
         
         sendByte(0b000000010); // 1 microspace
     }
-    delay(LETTER_DELAY + LETTER_DELAY * length / 5);
+    delay(2 * LETTER_DELAY + LETTER_DELAY * length / 5);
 }
 
 void fastTextFinish() {
