@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-import serial
-import time
-import sys
-import math
+# coding=utf-8
 import os
+import sys
+import time
 
-MAXLINE = 60 
+import serial
+
+MAXLINE = 60
 
 if len(sys.argv) != 2:
     print("Usage:\n\ttextToBean filename")
@@ -24,21 +25,21 @@ fileLen = os.path.getsize(filePath)
 # sent in little-endian format
 stringHeader = chr(0x00) + chr(fileLen & 0xff) + chr(fileLen >> 8)
 try:
-    with open(filePath,"r") as f:
+    with open(filePath, "r") as f:
         # read MAXLINE characters at a time and send
-        while True: 
+        while True:
             chars = f.read(MAXLINE)
-            if (chars == ''):
+            if chars == '':
                 break
             ser.write(stringHeader + chars)
-            stringHeader = '' # not needed any more
+            stringHeader = ''  # not needed any more
             sys.stdout.write(chars)
             sys.stdout.flush()
             response = ""
             while True:
                 response += ser.read(10)
                 if len(response) > 0 and response[-1] == '\n':
-                    #print("(bytes written:"+response.rstrip()+")")
+                    # print("(bytes written:"+response.rstrip()+")")
                     break
                 time.sleep(0.1)
 except KeyboardInterrupt:
