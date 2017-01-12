@@ -1,37 +1,50 @@
 #!/usr/bin/env python
+# coding=utf-8
 
-import serial,readchar,sys,time,threading,Queue
+import sys
+import threading
+import time
+
+import readchar
+import serial
+
+try:
+    from queue import Queue
+except ImportError:
+    from Queue import Queue
+
 
 # define a function that will be run in a thread and will
 # read character input and buffer it
 def readChars(q):
     t = threading.currentThread()
-    while getattr(t,"do_run", True):
+    while getattr(t, "do_run", True):
         key = readchar.readchar()
         q.put(key)
 
-# setup serial 
+
+# setup serial
 ser = serial.Serial('/dev/cu.LightBlue-Bean', 57600, timeout=0.5)
 # wait a bit
 time.sleep(0.5)
 
-q = Queue.Queue()
+q = Queue()
 
 if __name__ == "__main__":
-    t = threading.Thread(target=readChars,args=(q,))
-    num = 0;
+    t = threading.Thread(target=readChars, args=(q,))
+    num = 0
     print("Please start typing! (ctrl-c or ctrl-d to quit, ctrl-g for bell)")
     t.start()
     while True:
-        if (not q.empty()):
+        if not q.empty():
             key = q.get()
-            if (key == '\r'):
+            if key == '\r':
                 print('\r')
             else:
-                if key != '\x07': # ignore bell for terminal
+                if key != '\x07':  # ignore bell for terminal
                     sys.stdout.write(key)
                     sys.stdout.flush()
-            if key == '\x03' or key == '\x04': # ctrl-c or ctrl-d
+            if key == '\x03' or key == '\x04':  # ctrl-c or ctrl-d
                 t.do_run = False
                 print("\r\nPress a key to stop.\r")
                 t.join()
