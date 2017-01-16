@@ -1,0 +1,3 @@
+(fp_lib_table
+  (lib (name JST_Connector)(type KiCad)(uri /Users/Tofer/Downloads/kicad-library-master/template/Arduino_Nano)(options "")(descr ""))
+)

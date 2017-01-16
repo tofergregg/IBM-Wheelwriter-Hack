@@ -1,0 +1,150 @@
+EESchema Schematic File Version 2
+LIBS:power
+LIBS:device
+LIBS:transistors
+LIBS:conn
+LIBS:linear
+LIBS:regul
+LIBS:74xx
+LIBS:cmos4000
+LIBS:adc-dac
+LIBS:memory
+LIBS:xilinx
+LIBS:microcontrollers
+LIBS:dsp
+LIBS:microchip
+LIBS:analog_switches
+LIBS:motorola
+LIBS:texas
+LIBS:intel
+LIBS:audio
+LIBS:interface
+LIBS:digital-audio
+LIBS:philips
+LIBS:display
+LIBS:cypress
+LIBS:siliconi
+LIBS:opto
+LIBS:atmel
+LIBS:contrib
+LIBS:valves
+LIBS:ArudinoPCB-cache
+EELAYER 25 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L +5V #PWR01
+U 1 1 587BF170
+P 850 750
+F 0 "#PWR01" H 850 600 50  0001 C CNN
+F 1 "+5V" H 850 890 50  0000 C CNN
+F 2 "" H 850 750 50  0000 C CNN
+F 3 "" H 850 750 50  0000 C CNN
+	1    850  750 
+	1    0    0    -1  
+$EndComp
+$Comp
+L GND #PWR02
+U 1 1 587BF198
+P 1600 1750
+F 0 "#PWR02" H 1600 1500 50  0001 C CNN
+F 1 "GND" H 1600 1600 50  0000 C CNN
+F 2 "" H 1600 1750 50  0000 C CNN
+F 3 "" H 1600 1750 50  0000 C CNN
+	1    1600 1750
+	1    0    0    -1  
+$EndComp
+$Comp
+L 2N7002 Q1
+U 1 1 587BFED3
+P 2450 1150
+F 0 "Q1" H 2650 1225 50  0000 L CNN
+F 1 "2N7002" H 2650 1150 50  0000 L CNN
+F 2 "TO_SOT_Packages_SMD:SOT-23" H 2650 1075 50  0001 L CIN
+F 3 "" H 2450 1150 50  0000 L CNN
+	1    2450 1150
+	1    0    0    -1  
+$EndComp
+$Comp
+L R R1
+U 1 1 587BFF09
+P 1250 1200
+F 0 "R1" V 1330 1200 50  0000 C CNN
+F 1 "200" V 1250 1200 50  0000 C CNN
+F 2 "Resistors_SMD:R_1206" V 1180 1200 50  0001 C CNN
+F 3 "" H 1250 1200 50  0000 C CNN
+	1    1250 1200
+	0    1    1    0   
+$EndComp
+$Comp
+L CONN_02X02 P2
+U 1 1 587C00AE
+P 1250 900
+F 0 "P2" H 1250 1050 50  0000 C CNN
+F 1 "Arduino" H 1250 750 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_2x02" H 1250 -300 50  0001 C CNN
+F 3 "" H 1250 -300 50  0000 C CNN
+	1    1250 900 
+	1    0    0    -1  
+$EndComp
+$Comp
+L CONN_01X03 P1
+U 1 1 587C080F
+P 1200 1600
+F 0 "P1" H 1200 1800 50  0000 C CNN
+F 1 "Typewriter" V 1300 1600 50  0000 C CNN
+F 2 "Socket_Strips:Socket_Strip_Straight_1x03" H 1200 1600 50  0001 C CNN
+F 3 "" H 1200 1600 50  0000 C CNN
+	1    1200 1600
+	-1   0    0    1   
+$EndComp
+Wire Wire Line
+	1000 850  850  850 
+Wire Wire Line
+	850  750  850  1950
+Connection ~ 850  850 
+Wire Wire Line
+	1500 850  1600 850 
+Wire Wire Line
+	1600 850  1600 1750
+Wire Wire Line
+	1400 1500 1600 1500
+Connection ~ 1600 1500
+Wire Wire Line
+	1000 950  1000 1200
+Wire Wire Line
+	1000 1200 1100 1200
+Wire Wire Line
+	1400 1200 2250 1200
+Wire Wire Line
+	1500 950  2550 950 
+Wire Wire Line
+	1400 1600 1950 1600
+Wire Wire Line
+	1950 1600 1950 950 
+Connection ~ 1950 950 
+Wire Wire Line
+	1400 1700 1400 1950
+Wire Wire Line
+	1400 1950 850  1950
+Wire Wire Line
+	2550 1700 1600 1700
+Connection ~ 1600 1700
+Wire Wire Line
+	2550 1350 2550 1700
+Text Label 1950 950  0    60   ~ 0
+bus
+Text Label 1000 1150 0    60   ~ 0
+bus_control
+$EndSCHEMATC

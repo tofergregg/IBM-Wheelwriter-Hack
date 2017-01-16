@@ -1,0 +1,370 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP BARREL_JACK
+D DC Barrel Jack
+$ENDCMP
+#
+$CMP DB15
+D D-SUB Connector - 15 pos
+K dsub
+$ENDCMP
+#
+$CMP DB25
+D D-SUB Connector - 25 pos
+K dsub
+$ENDCMP
+#
+$CMP DB9
+D D-SUB Connector - 9 pos (serial)
+K dsub
+$ENDCMP
+#
+$CMP HEADER-1x01
+D Header - Single Row - 1 Pos
+K header 1x01
+$ENDCMP
+#
+$CMP HEADER-1x02
+D Header - Single Row - 2 Pos
+K header 1x02
+$ENDCMP
+#
+$CMP HEADER-1x03
+D Header - Single Row - 3 Pos
+K header 1x03
+$ENDCMP
+#
+$CMP HEADER-1x04
+D Header - Single Row - 4 Pos
+K header 1x04
+$ENDCMP
+#
+$CMP HEADER-1x05
+D Header - Single Row - 5 Pos
+K header 1x01
+$ENDCMP
+#
+$CMP HEADER-1x06
+D Header - Single Row - 6 Pos
+K header 1x06
+$ENDCMP
+#
+$CMP HEADER-1x07
+D Header - Single Row - 7 Pos
+K header 1x07
+$ENDCMP
+#
+$CMP HEADER-1x08
+D Header - Single Row - 8 Pos
+K header 1x08
+$ENDCMP
+#
+$CMP HEADER-1x09
+D Header - Single Row - 9 Pos
+K header 1x09
+$ENDCMP
+#
+$CMP HEADER-1x10
+D Header - Single Row - 10 Pos
+K header 1x10
+$ENDCMP
+#
+$CMP HEADER-1x11
+D Header - Single Row - 11 Pos
+K header 1x11
+$ENDCMP
+#
+$CMP HEADER-1x12
+D Header - Single Row - 12 Pos
+K header 1x12
+$ENDCMP
+#
+$CMP HEADER-1x13
+D Header - Single Row - 13 Pos
+K header 1x13
+$ENDCMP
+#
+$CMP HEADER-1x14
+D Header - Single Row - 14 Pos
+K header 1x14
+$ENDCMP
+#
+$CMP HEADER-1x15
+D Header - Single Row - 15 Pos
+K header 1x15
+$ENDCMP
+#
+$CMP HEADER-1x16
+D Header - Single Row - 16 Pos
+K header 1x16
+$ENDCMP
+#
+$CMP HEADER-1x17
+D Header - Single Row - 17 Pos
+K header 1x17
+$ENDCMP
+#
+$CMP HEADER-1x18
+D Header - Single Row - 18 Pos
+K header 1x18
+$ENDCMP
+#
+$CMP HEADER-1x19
+D Header - Single Row - 19 Pos
+K header 1x19
+$ENDCMP
+#
+$CMP HEADER-1x20
+D Header - Single Row - 20 Pos
+K header 1x20
+$ENDCMP
+#
+$CMP HEADER-1x21
+D Header - Single Row - 21 Pos
+K header 1x21
+$ENDCMP
+#
+$CMP HEADER-1x22
+D Header - Single Row - 22 Pos
+K header 1x22
+$ENDCMP
+#
+$CMP HEADER-1x23
+D Header - Single Row - 23 Pos
+K header 1x23
+$ENDCMP
+#
+$CMP HEADER-1x24
+D Header - Single Row - 24 Pos
+K header 1x24
+$ENDCMP
+#
+$CMP HEADER-1x25
+D Header - Single Row - 25 Pos
+K header 1x25
+$ENDCMP
+#
+$CMP HEADER-1x26
+D Header - Single Row - 26 Pos
+K header 1x26
+$ENDCMP
+#
+$CMP HEADER-1x27
+D Header - Single Row - 27 Pos
+K header 1x27
+$ENDCMP
+#
+$CMP HEADER-1x28
+D Header - Single Row - 28 Pos
+K header 1x28
+$ENDCMP
+#
+$CMP HEADER-1x29
+D Header - Single Row - 29 Pos
+K header 1x29
+$ENDCMP
+#
+$CMP HEADER-1x30
+D Header - Single Row - 30 Pos
+K header 1x30
+$ENDCMP
+#
+$CMP HEADER-1x31
+D Header - Single Row - 31 Pos
+K header 1x31
+$ENDCMP
+#
+$CMP HEADER-1x32
+D Header - Single Row - 32 Pos
+K header 1x32
+$ENDCMP
+#
+$CMP HEADER-1x33
+D Header - Single Row - 33 Pos
+K header 1x33
+$ENDCMP
+#
+$CMP HEADER-1x34
+D Header - Single Row - 34 Pos
+K header 1x34
+$ENDCMP
+#
+$CMP HEADER-1x35
+D Header - Single Row - 35 Pos
+K header 1x35
+$ENDCMP
+#
+$CMP HEADER-1x36
+D Header - Single Row - 36 Pos
+K header 1x36
+$ENDCMP
+#
+$CMP HEADER-1x37
+D Header - Single Row - 37 Pos
+K header 1x37
+$ENDCMP
+#
+$CMP HEADER-1x38
+D Header - Single Row - 38 Pos
+K header 1x38
+$ENDCMP
+#
+$CMP HEADER-1x39
+D Header - Single Row - 39 Pos
+K header 1x39
+$ENDCMP
+#
+$CMP HEADER-1x40
+D Header - Single Row - 40 Pos
+K header 1x40
+$ENDCMP
+#
+$CMP HEADER-2x01
+D Header - Dual Row - 2 Pos
+K header 2x01
+$ENDCMP
+#
+$CMP HEADER-2x02
+D Header - Dual Row - 4 Pos
+K header 2x02
+$ENDCMP
+#
+$CMP HEADER-2x03
+D Header - Dual Row - 6 Pos
+K header 2x03
+$ENDCMP
+#
+$CMP HEADER-2x04
+D Header - Dual Row - 8 Pos
+K header 2x04
+$ENDCMP
+#
+$CMP HEADER-2x05
+D Header - Dual Row - 10 Pos
+K header 2x05
+$ENDCMP
+#
+$CMP HEADER-2x06
+D Header - Dual Row - 12 Pos
+K header 2x06
+$ENDCMP
+#
+$CMP HEADER-2x07
+D Header - Dual Row - 14 Pos
+K header 2x07
+$ENDCMP
+#
+$CMP HEADER-2x08
+D Header - Dual Row - 16 Pos
+K header 2x08
+$ENDCMP
+#
+$CMP HEADER-2x09
+D Header - Dual Row - 18 Pos
+K header 2x09
+$ENDCMP
+#
+$CMP HEADER-2x10
+D Header - Dual Row - 20 Pos
+K header 2x10
+$ENDCMP
+#
+$CMP HEADER-2x11
+D Header - Dual Row - 22 Pos
+K header 2x11
+$ENDCMP
+#
+$CMP HEADER-2x12
+D Header - Dual Row - 24 Pos
+K header 2x12
+$ENDCMP
+#
+$CMP HEADER-2x13
+D Header - Dual Row - 26 Pos
+K header 2x13
+$ENDCMP
+#
+$CMP HEADER-2x14
+D Header - Dual Row - 28 Pos
+K header 2x14
+$ENDCMP
+#
+$CMP HEADER-2x15
+D Header - Dual Row - 30 Pos
+K header 2x15
+$ENDCMP
+#
+$CMP HEADER-2x16
+D Header - Dual Row - 32 Pos
+K header 2x16
+$ENDCMP
+#
+$CMP HEADER-2x17
+D Header - Dual Row - 34 Pos
+K header 2x17
+$ENDCMP
+#
+$CMP HEADER-2x18
+D Header - Dual Row - 36 Pos
+K header 2x18
+$ENDCMP
+#
+$CMP HEADER-2x19
+D Header - Dual Row - 38 Pos
+K header 2x19
+$ENDCMP
+#
+$CMP HEADER-2x20
+D Header - Dual Row - 40 Pos
+K header 2x20
+$ENDCMP
+#
+$CMP Hole
+D PCB Mounting Hole
+$ENDCMP
+#
+$CMP Micro_SD
+D Micro SD card connector
+K SD
+$ENDCMP
+#
+$CMP RJ45
+D RJ45 Connector
+K rj45
+$ENDCMP
+#
+$CMP RJ45-W-LED
+D RJ45 Connector with leds
+K RJ45
+$ENDCMP
+#
+$CMP RJ45-W-MAG-LED
+D RJ45 Connector with magnetics and leds
+K RJ45
+$ENDCMP
+#
+$CMP SD_Card
+D SD Card connector
+K SD
+$ENDCMP
+#
+$CMP TEST-POINT
+D Test point
+$ENDCMP
+#
+$CMP USB-A
+D USB Connector - Type A
+K USB
+$ENDCMP
+#
+$CMP USB-B
+D USB Connector - Type B
+K USB
+$ENDCMP
+#
+$CMP USB-MINI-B
+D USB Connector - Type B
+K USB
+$ENDCMP
+#
+#End Doc Library
