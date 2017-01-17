@@ -7,10 +7,16 @@ import time
 
 if __name__ == "__main__":
     # setup serial
-    ser = serial.Serial('/dev/tty.wchusbserial1410', 115200, timeout=0.1)
+    ser = serial.Serial()
+    ser.port = '/dev/tty.wchusbserial1410'
+    ser.baudrate = 115200
+    ser.timeout = 0.1
+    ser.setDTR(False)
+    ser.open()
+    #ser = serial.Serial('/dev/tty.wchusbserial1410', 115200, timeout=0.1)
 
     # wait a bit
-    time.sleep(0.5)
+    time.sleep(2)
 
     screen = curses.initscr()
     try:

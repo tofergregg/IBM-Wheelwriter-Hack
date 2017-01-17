@@ -9,9 +9,10 @@
 //#include<PinChangeInt.h>
 
 #define LETTER_DELAY 450
-#define CARRIAGE_WAIT_BASE 300
+#define CARRIAGE_WAIT_BASE 200
 #define CARRIAGE_WAIT_MULTIPLIER 15
 
+// on an Arduino Nano, ATmega328, the following will delay roughly 5.25us
 #define pulseDelay() { for (int i=0;i<16;i++) { __asm__ __volatile__("nop\n\t"); } }
 
 byte asciiTrans[128] = 
@@ -41,18 +42,19 @@ byte asciiTrans[128] =
      
 void setup() 
 {
-  // initialize serial communication at 57600 bits per second:
+  // initialize serial communication at 115200 bits per second:
   Serial.begin(115200);
-
   Serial.setTimeout(25);
   
   // Digital pins
   pinMode(2,OUTPUT); // pin that will trigger the bus
   pinMode(3, INPUT); // listening pin
-
+  pinMode(4, INPUT_PULLUP); // for the button
+  
   // start the input pin off (meaning the bus is high, normal state)
   PORTD &= 0b11111011;
-  pinMode(4, INPUT_PULLUP);
+
+  //resetTypewriter(); // Arduino resets whenever a new serial connection is made...
 }
 
 // the loop routine runs over and over again forever:
@@ -83,11 +85,14 @@ void loop()
           
           if (command == 0) { // text to print
             // look for next two bytes
+            // reset the typewriter so we know we are on the begining of a line
+            resetTypewriter();
             Serial.readBytes(buffer,2);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             charCount = printAllChars(buffer,bytesToPrint,charCount);
           }
           else if (command == 1) { // image to print
+            resetTypewriter();
             Serial.println("image");
             printImage(buffer);
           } else {
@@ -110,7 +115,7 @@ void loop()
         digitalWrite(13,1); // led
         delay(100);
         digitalWrite(13,0);    
-
+        resetTypewriter();
 
         //print_str("aaaaaaaaaaaa");
         
@@ -150,9 +155,6 @@ void loop()
         delayMicroseconds(60);*/
         /////////////
         //PORTD &= 0b11111011;
-        digitalWrite(13,1); // led
-        delay(10);
-        digitalWrite(13,0);
         //Bean.setLed(255, 0, 0);
         //Bean.sleep(10);
         //Bean.setLed(0,0,0); 
@@ -160,17 +162,6 @@ void loop()
       delay(10);
       //Bean.sleep(10);  
 }
-
-/*void pulseDelay() {
-  // on an Arduino Nano, this will delay ~5.25us
-  // which is one pulse width on the IBM Wheelwriter
-  volatile int i;
-  i++;
-  i++;
-  i++;
-  i++;
-  i++;
-}*/
 
 int printOne(int charToPrint, int charCount) {
     // print the character, and return the number of chars on the line that are left.
@@ -661,7 +652,8 @@ void micro_backspace(int microspaces) {
     sendByte(0b100100001);
     sendByte(0b000000110);
     sendByte(0b000000000);
-    sendByte(microspaces * 3);
+    //sendByte(microspaces * 3);
+    sendByte(microspaces);
     delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * microspaces / 5);
     //sendByte(0b000000010);
     /*
@@ -774,5 +766,39 @@ void fastTextFinish() {
     delay(LETTER_DELAY * 2); // a bit more time
 }
 
+void resetTypewriter() {
+  sendByte(0b100100001);
+  sendByte(0b000000000);
+  //sendByte(0b000100110); // receives this...
+  sendByte(0b100100001);
+  sendByte(0b000000001);
+  sendByte(0b000100000);
+
+  sendByte(0b100100001);
+  sendByte(0b000001001);
+  sendByte(0b000000000);
+  sendByte(0b100100001);
+  sendByte(0b000001101);
+  sendByte(0b000010010);
+  sendByte(0b100100001);
+  sendByte(0b000000110);
+  sendByte(0b010000000);
+  sendByte(0b000000000);
+  sendByte(0b100100001);
+  sendByte(0b000001101);
+  sendByte(0b000001001);
+  sendByte(0b100100001);
+  sendByte(0b000000110);
+  sendByte(0b010000000);
+  sendByte(0b000000000);
+  sendByte(0b100100001);
+  sendByte(0b000001010);
+  sendByte(0b000000000);
+  sendByte(0b100100001);
+  sendByte(0b000000111);
+  sendByte(0b100100001);
+  sendByte(0b000001100);
+  sendByte(0b000000001);
+}
 
 
