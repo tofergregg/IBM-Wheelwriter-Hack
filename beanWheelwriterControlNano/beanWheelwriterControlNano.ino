@@ -84,7 +84,7 @@ void loop()
           //Serial.println(int(command));
           
           if (command == 0) { // text to print
-            // look for next two bytes
+            // look for next two bytesp
             // reset the typewriter so we know we are on the begining of a line
             resetTypewriter();
             Serial.readBytes(buffer,2);
@@ -304,7 +304,7 @@ void printImage(char *buffer) {
         if (timeout) {
             paper_vert(1,1);
             Serial.println("timeout");
-            micro_backspace(rowBitsPrinted);
+            micro_backspace(rowBitsPrinted * 3);
             break;
         }
         bitsRead = Serial.readBytes(buffer, 3);
@@ -324,7 +324,7 @@ void printRun(uint16_t runLength, char c) {
     if (c == '\n') {
       paper_vert(1,1); // Move down one pixel
       if (runLength > 0) {
-          micro_backspace(runLength);
+          micro_backspace(runLength * 3);
       }
     }
     else if (c == ' ') {
@@ -640,7 +640,7 @@ void correct_letter(int letter) {
 }
 
 void micro_backspace(int microspaces) {
-    // 5 microspaces is one space
+    // 10 microspaces is one space
     sendByte(0b100100001);
     sendByte(0b000001110);
     sendByte(0b011010000);
