@@ -4,16 +4,35 @@
 import curses
 import serial
 import time
+import availablePorts
+import sys
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        portChoiceInt = int(sys.argv[1])
+    else:
+        portChoiceInt = 0
+    # choose port
+    ports = availablePorts.serial_ports()
+
+    if len(ports) == 1:
+        # just choose the first
+        portChoice = ports[0]
+    else:
+        if portChoiceInt == 0:
+            print("Please choose a port:")
+            for idx,p in enumerate(ports):
+                print("\t"+str(idx+1)+") "+p)
+            portChoiceInt = int(input())
+        portChoice = ports[portChoiceInt-1]
     # setup serial
     ser = serial.Serial()
-    ser.port = '/dev/tty.wchusbserial1410'
+    ser.port = portChoice
     ser.baudrate = 115200
     ser.timeout = 0.1
     ser.setDTR(False)
     ser.open()
-    #ser = serial.Serial('/dev/tty.wchusbserial1410', 115200, timeout=0.1)
+    #ser = serial.Serial('/dev/ttyUSB0', 115200, timeout=0.1)
 
     # wait a bit
     time.sleep(2)

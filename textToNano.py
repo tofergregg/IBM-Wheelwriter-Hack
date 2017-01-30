@@ -3,18 +3,34 @@
 import os
 import sys
 import time
-
+import availablePorts
 import serial
 
 MAXLINE = 60
 
-if len(sys.argv) != 2:
+if len(sys.argv) == 1:
     print("Usage:\n\ttextToBean filename")
     quit()
 
 filePath = sys.argv[1]
+if len(sys.argv) > 2:
+    portChoiceInt = int(sys.argv[2])
+else:
+    portChoiceInt = 0
+# choose port
+ports = availablePorts.serial_ports()
 
-ser = serial.Serial('/dev/tty.wchusbserial1410', 115200, timeout=0.1)
+if len(ports) == 1:
+    # just choose the first
+    portChoice = ports[0]
+else:
+    if portChoiceInt == 0:
+	print("Please choose a port:")
+	for idx,p in enumerate(ports):
+	    print("\t"+str(idx+1)+") "+p)
+	portChoiceInt = int(input())
+    portChoice = ports[portChoiceInt-1]
+ser = serial.Serial(portChoice, 115200, timeout=0.1)
 # wait a bit
 time.sleep(2)
 
