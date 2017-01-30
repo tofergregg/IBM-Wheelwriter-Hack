@@ -8,6 +8,17 @@
 # take effect:
 #    $ sudo usermod -a -G dialout $USER
 
+# note 2: if you are on Windows, you will have to
+# install both pyserial and curses
+# To install pyserial:
+#   pip install pyserial
+# To install curses:
+# Go to http://www.lfd.uci.edu/~gohlke/pythonlibs/#curses
+# and download the curses program (possibly win32)
+# In a command window, type:
+#   pip install pathToFileYouDownloaded
+# e.g., pip install \Users\Tofer\Downloads\curses‑2.2‑cp27‑none‑win32.whl 
+
 import curses
 import serial
 import time
