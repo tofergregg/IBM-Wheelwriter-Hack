@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+# note: if you are on linux, you might have to run
+# with sudo
+# If you don't want to run with sudo, you can try
+# adding dialout to your user (requires a logout to
+# take effect:
+#    $ sudo usermod -a -G dialout $USER
+
 import sys
 import time
 
 import serial
 from PIL import Image
+import availablePorts
 
 MAXWIDTH = 500
 
@@ -15,6 +23,23 @@ if len(sys.argv) != 2:
 im = Image.open(sys.argv[1])
 im = im.convert('RGB')
 
+if len(sys.argv) > 2:
+    portChoiceInt = int(sys.argv[2])
+else:
+    portChoiceInt = 0
+# choose port
+ports = availablePorts.serial_ports()
+
+if len(ports) == 1:
+    # just choose the first
+    portChoice = ports[0]
+else:
+    if portChoiceInt == 0:
+	print("Please choose a port:")
+	for idx,p in enumerate(ports):
+	    print("\t"+str(idx+1)+") "+p)
+	portChoiceInt = int(input())
+    portChoice = ports[portChoiceInt-1]
 # resize to at most MAXWIDTH  wide
 if im.width > MAXWIDTH:
     wpercent = (MAXWIDTH / float(im.width))
@@ -76,7 +101,7 @@ runs.append((0, 0, 0))  # signal to end the image printing
 # print runs
 # quit()
 
-ser = serial.Serial('/dev/tty.wchusbserial1410', 115200, timeout=0.1)
+ser = serial.Serial(portChoice, 115200, timeout=0.1)
 # wait a bit
 time.sleep(2)
 

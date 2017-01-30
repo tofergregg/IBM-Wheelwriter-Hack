@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # coding=utf-8
 
+# note: if you are on linux, you might have to run
+# with sudo
+# If you don't want to run with sudo, you can try
+# adding dialout to your user (requires a logout to
+# take effect:
+#    $ sudo usermod -a -G dialout $USER
+
 import curses
 import serial
 import time
