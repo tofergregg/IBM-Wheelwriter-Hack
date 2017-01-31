@@ -262,7 +262,14 @@ int printAllChars(char buffer[],
         bufferPos = 0;
         while (bufferPos < bytesRead) {
           // print all the bytes
-          if (buffer[bufferPos] != '\r' and buffer[bufferPos] != '\n') {
+          // check for underline and bold
+          if (buffer[bufferPos] == 2) { // bold
+              bold = !bold;
+          }
+          else if (buffer[bufferPos] == 3) { // underline
+              underline = !underline;
+          }
+          else if (buffer[bufferPos] != '\r' and buffer[bufferPos] != '\n') {
                 // begin fast printing
                 if (!fastPrinting) {
                     fastTextInit();
@@ -768,8 +775,27 @@ void fastTextChars(char *s, int length) {
         sendByte(0b000000011);
     
         sendByte(asciiTrans[*s++]);
-        
-        sendByte(0b000001010);
+
+        if (underline) {
+            sendByte(0b000000000); // no space
+            sendByte(0b100100001);
+            sendByte(0b000001011);
+            sendByte(0b100100001);
+            sendByte(0b000000011);
+            sendByte(asciiTrans['_']);            
+        }
+        if (bold) {
+            sendByte(0b000000001); // one microspace
+            sendByte(0b100100001);
+            sendByte(0b000001011);
+            sendByte(0b100100001);
+            sendByte(0b000000011);
+            sendByte(asciiTrans[*s++]);
+            sendByte(0b000001001);
+        }
+        else {
+            sendByte(0b000001010);
+        }
     }
 }
 
