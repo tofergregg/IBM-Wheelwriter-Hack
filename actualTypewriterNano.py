@@ -77,6 +77,11 @@ if __name__ == "__main__":
                 pass
             elif event == 393:  # shift left-arrow for micro-backspace
                 event = 131
+            elif event == 21:
+                screen.addstr('(underline)')
+                event = 3 # convert to code for underline
+            elif event == 2:
+                screen.addstr('(bold)')
             else:
                 screen.addch(event)
             # screen.addstr(str(type(event)))

@@ -12,6 +12,9 @@
 #define CARRIAGE_WAIT_BASE 200
 #define CARRIAGE_WAIT_MULTIPLIER 15
 
+bool bold = false; // off to start
+bool underline = false; // off to start
+
 // on an Arduino Nano, ATmega328, the following will delay roughly 5.25us
 #define pulseDelay() { for (int i=0;i<16;i++) { __asm__ __volatile__("nop\n\t"); } }
 
@@ -73,8 +76,8 @@ void loop()
           // 0: next two bytes will be the number of characters we are going
           //    to send
           // 1: image bits (next two bytes will be the width and height)
-          // 2: TBD
-          // 3: TBD
+          // 2: Turn on Bold
+          // 3: Turn on Underline
           // If the byte is >= 4, just treat as one character
           bytesRead = Serial.readBytes(buffer, 1);
           //Serial.print("Read ");
@@ -95,6 +98,12 @@ void loop()
             resetTypewriter();
             Serial.println("image");
             printImage(buffer);
+          } else if (command == 2) {
+            bold = !bold; // toggle
+            Serial.println("ok");
+          } else if (command == 3) {
+            underline = !underline;
+            Serial.println("ok");
           } else {
             charCount = printOne(command,charCount);
           }
@@ -485,7 +494,26 @@ void send_letter(int letter) {
     sendByte(0b100100001);
     sendByte(0b000000011);
     sendByte(letter);
-    sendByte(0b000001010);
+    if (underline) {
+      sendByte(0b000000000); // no space
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000011);
+      sendByte(asciiTrans['_']);
+    }
+    if (bold) {
+      sendByte(0b000000001); // one microspace
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000011);
+      sendByte(letter);
+      sendByte(0b000001001);
+    } else {
+      // not bold
+      sendByte(0b000001010); // spacing for one character
+    }
     //delay(LETTER_DELAY); // before next character
 }
 

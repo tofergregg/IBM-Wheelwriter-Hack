@@ -34,6 +34,8 @@ if __name__ == "__main__":
                 pass
             elif event == 393:  # shift left-arrow for micro-backspace
                 event = 131
+            elif event == 21:
+                screen.addstr('ctrl-u')
             else:
                 screen.addch(event)
             # screen.addstr(str(type(event)))
