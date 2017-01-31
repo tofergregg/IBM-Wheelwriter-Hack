@@ -31,7 +31,7 @@ if len(sys.argv) > 2:
 else:
     portChoiceInt = 0
 # choose port
-if HARDCODED_PORT = '':
+if HARDCODED_PORT == '':
     ports = availablePorts.serial_ports()
 
     if len(ports) == 1:
@@ -105,8 +105,8 @@ for r in range(0, im2.height * 3, 3):
     runs.append((lineBits & 0xff, lineBits >> 8, ord('\n')))
 
 runs.append((0, 0, 0))  # signal to end the image printing
-# print runs
-# quit()
+print runs
+quit()
 
 ser = serial.Serial(portChoice, 115200, timeout=0.1)
 # wait a bit
