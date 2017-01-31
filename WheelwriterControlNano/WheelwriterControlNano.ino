@@ -790,7 +790,7 @@ void fastTextChars(char *s, int length) {
             sendByte(0b000001011);
             sendByte(0b100100001);
             sendByte(0b000000011);
-            sendByte(asciiTrans[*s++]);
+            sendByte(asciiTrans[*(s-1)]);
             sendByte(0b000001001);
         }
         else {

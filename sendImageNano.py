@@ -18,7 +18,7 @@ import availablePorts
 MAXWIDTH = 500
 
 if len(sys.argv) != 2:
-    print("Usage:\n\t./sendImage image")
+    print("Usage:\n\t./sendImage image [port choice]")
     quit()
 im = Image.open(sys.argv[1])
 im = im.convert('RGB')
