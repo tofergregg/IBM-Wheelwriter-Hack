@@ -17,6 +17,9 @@ import availablePorts
 
 MAXWIDTH = 500
 
+# if HARDCODED_PORT is '' then the user will be given a choice
+HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+
 if len(sys.argv) != 2:
     print("Usage:\n\t./sendImage image [port choice]")
     quit()
@@ -28,18 +31,22 @@ if len(sys.argv) > 2:
 else:
     portChoiceInt = 0
 # choose port
-ports = availablePorts.serial_ports()
+if HARDCODED_PORT = '':
+    ports = availablePorts.serial_ports()
 
-if len(ports) == 1:
-    # just choose the first
-    portChoice = ports[0]
+    if len(ports) == 1:
+        # just choose the first
+        portChoice = ports[0]
+    else:
+        if portChoiceInt == 0:
+            print("Please choose a port:")
+            for idx,p in enumerate(ports):
+                print("\t"+str(idx+1)+") "+p)
+            portChoiceInt = int(input())
+        portChoice = ports[portChoiceInt-1]
 else:
-    if portChoiceInt == 0:
-	print("Please choose a port:")
-	for idx,p in enumerate(ports):
-	    print("\t"+str(idx+1)+") "+p)
-	portChoiceInt = int(input())
-    portChoice = ports[portChoiceInt-1]
+    portChoice = HARDCODED_PORT
+
 # resize to at most MAXWIDTH  wide
 if im.width > MAXWIDTH:
     wpercent = (MAXWIDTH / float(im.width))

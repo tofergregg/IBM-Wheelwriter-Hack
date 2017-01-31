@@ -25,24 +25,30 @@ import time
 import availablePorts
 import sys
 
+# if HARDCODED_PORT is '', the user will be given a choice
+HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         portChoiceInt = int(sys.argv[1])
     else:
         portChoiceInt = 0
-    # choose port
-    ports = availablePorts.serial_ports()
+    if HARDCODED_PORT == '':
+        # choose port
+        ports = availablePorts.serial_ports()
 
-    if len(ports) == 1:
-        # just choose the first
-        portChoice = ports[0]
+        if len(ports) == 1:
+            # just choose the first
+            portChoice = ports[0]
+        else:
+            if portChoiceInt == 0:
+                print("Please choose a port:")
+                for idx,p in enumerate(ports):
+                    print("\t"+str(idx+1)+") "+p)
+                portChoiceInt = int(input())
+            portChoice = ports[portChoiceInt-1]
     else:
-        if portChoiceInt == 0:
-            print("Please choose a port:")
-            for idx,p in enumerate(ports):
-                print("\t"+str(idx+1)+") "+p)
-            portChoiceInt = int(input())
-        portChoice = ports[portChoiceInt-1]
+        portChoice = HARDCODED_PORT
     # setup serial
     ser = serial.Serial()
     ser.port = portChoice
