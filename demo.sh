@@ -1,5 +1,5 @@
 #!/bin/bash
-./textToBean.py hitchBegin.txt
-./sendImage.py images/moog25.png
+./textToNano.py hitchBegin.txt
+./sendImageNano.py images/moog25.png
 sleep 3
-./textToBean.py moog.txt
+./textToNano.py moog.txt
