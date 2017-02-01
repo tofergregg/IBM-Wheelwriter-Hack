@@ -319,7 +319,7 @@ void printImage(char *buffer) {
           if (millis() - startTime > 2000) {
             timeout = true;
           }
-          delay(100);
+          delay(50);
           //Bean.sleep(10);
         }
         if (timeout) {
@@ -345,7 +345,7 @@ void printRun(uint16_t runLength, char c) {
     static bool inFastText = false;
     if (c == '\n') {
       fastTextFinish();
-      delay(LETTER_DELAY);
+      //delay(LETTER_DELAY);
       paper_vert(1,1); // Move down one pixel
       if (runLength > 0) {
           micro_backspace(runLength * 3);
@@ -588,7 +588,7 @@ void paper_vert(int direction, int microspaces) {
     
     sendByte(0b100100001);
     sendByte(0b000001011);
-    delay(LETTER_DELAY + LETTER_DELAY / 10 * microspaces/5);
+    //delay(LETTER_DELAY + LETTER_DELAY / 10 * microspaces/5);
 }
 
 void backspace_no_correct() {
@@ -661,7 +661,7 @@ void send_return(int numChars) {
     sendByteOnPin(0b000001011);*/
 
     // wait for carriage 
-    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
+    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
 }
 
 void correct_letter(int letter) {
@@ -698,7 +698,7 @@ void micro_backspace(int microspaces) {
     sendByte(0b000000000);
     //sendByte(microspaces * 3);
     sendByte(microspaces);
-    delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * microspaces / 5);
+    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * microspaces / 5);
     //sendByte(0b000000010);
     /*
     sendByte(0b100100001);
@@ -833,7 +833,7 @@ void fastTextFinish() {
     sendByte(0b000001001);
     sendByte(0b000000000);
     
-    delay(LETTER_DELAY * 2); // a bit more time
+    //delay(LETTER_DELAY * 2); // a bit more time
 }
 
 void resetTypewriter() {
