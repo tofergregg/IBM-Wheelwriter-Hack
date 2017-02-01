@@ -96,7 +96,7 @@ void loop()
           }
           else if (command == 1) { // image to print
             resetTypewriter();
-            Serial.println("image");
+            //Serial.println("image");
             printImage(buffer);
           } else if (command == 2) {
             bold = !bold; // toggle
@@ -309,12 +309,17 @@ void printImage(char *buffer) {
         // read bytes from serial
         // wait for more bytes, but only wait up to 2 seconds
         unsigned long startTime = millis();
-        bool timeout = false; 
+        bool timeout = false;
+        bool first = true;
         while (Serial.available() == 0 and not timeout) {
+          if (first) {
+            Serial.println("Please send.");
+            first = false;
+          }
           if (millis() - startTime > 2000) {
             timeout = true;
           }
-          delay(10);
+          delay(100);
           //Bean.sleep(10);
         }
         if (timeout) {
@@ -324,7 +329,7 @@ void printImage(char *buffer) {
             break;
         }
         bitsRead = Serial.readBytes(buffer, 3);
-        Serial.println(bitsRead); // should always be 3
+        //Serial.println(bitsRead); // should always be 3
         if (buffer[0] == 0 and buffer[1] == 0 and buffer[2] == 0) {
           Serial.println("end received");
           break; // no more bits to print
@@ -337,17 +342,21 @@ void printImage(char *buffer) {
 }
 
 void printRun(uint16_t runLength, char c) {
+    static bool inFastText = false;
     if (c == '\n') {
+      fastTextFinish();
+      delay(LETTER_DELAY);
       paper_vert(1,1); // Move down one pixel
       if (runLength > 0) {
           micro_backspace(runLength * 3);
       }
+      inFastText = false;
     }
-    else if (c == ' ') {
-      // print a run of spaces
-      forwardSpaces(runLength);
-    } else {
-      fastTextInit();
+    else {
+      if (!inFastText) {
+        fastTextInit();
+        inFastText = true;
+      }
       fastTextCharsMicro(c,runLength);
     }
 }
@@ -801,15 +810,22 @@ void fastTextChars(char *s, int length) {
 
 void fastTextCharsMicro(char s, uint16_t length) {
     // letters start here
-    for (uint16_t i=0; i < length; i++) {
-        sendByte(0b100100001);
-        sendByte(0b000000011);
-    
-        sendByte(asciiTrans[s]);
+    if (s == ' ') {
+      // just make a fast run of spaces
+      sendByte(0b100100001);
+      sendByte(0b000000011);
+      sendByte(0b000000000);
+      sendByte(0b11 * length);
+    } else {
+        for (uint16_t i=0; i < length; i++) {
+            sendByte(0b100100001);
+            sendByte(0b000000011);
         
-        sendByte(0b000000011); // 1 microspace
+            sendByte(asciiTrans[s]);
+            sendByte(0b000000011); // 1 microspace
+        }
     }
-    delay(LETTER_DELAY + LETTER_DELAY / 10 * length / 5);
+    //delay(LETTER_DELAY + LETTER_DELAY / 10 * length / 5);
 }
 
 void fastTextFinish() {

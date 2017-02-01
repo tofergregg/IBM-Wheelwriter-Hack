@@ -105,8 +105,8 @@ for r in range(0, im2.height * 3, 3):
     runs.append((lineBits & 0xff, lineBits >> 8, ord('\n')))
 
 runs.append((0, 0, 0))  # signal to end the image printing
-print runs
-quit()
+#print runs
+#quit()
 
 ser = serial.Serial(portChoice, 115200, timeout=0.1)
 # wait a bit
@@ -118,9 +118,12 @@ try:
     ser.write(stringHeader)
 
     while len(runs) > 0:
-        run = runs[0]
-        runs = runs[1:]
-        ser.write(''.join([chr(x) for x in run]))
+        run = runs[:20] # send up to 60 bytes at a time
+        runs = runs[20:]
+        sendStr = ''
+        for r in run:
+            sendStr += ''.join([chr(x) for x in r])
+        ser.write(sendStr)
         print("Sent " + str(run))
         response = ""
         while True:
@@ -133,6 +136,7 @@ try:
         if "timeout" in response or "done" in response:
             print(response)
             break
+    print("Done.")
 except KeyboardInterrupt:
     pass
 ser.close()
