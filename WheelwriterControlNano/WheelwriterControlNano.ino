@@ -113,6 +113,7 @@ void loop()
           } else {
             charCount = printOne(command,charCount);
           }
+          digitalWrite(LED,0); // turn off LED when we are finished processing
       }
       // button for testing
       byte button = digitalRead(4);
