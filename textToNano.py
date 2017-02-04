@@ -55,7 +55,7 @@ def parseMarkdown(text):
             parsedText += c
     return parsedText
 
-MAXLINE = 60
+MAXLINE = 40
 # if HARDCODED_PORT is '', then the user will get a choice
 HARDCODED_PORT = '/dev/tty.wchusbserial1410'
 

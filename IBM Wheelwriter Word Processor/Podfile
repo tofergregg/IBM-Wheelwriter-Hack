@@ -1,0 +1,20 @@
+# Uncomment this line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'IBM Wheelwriter Word Processor' do
+  # Comment this line if you're not using Swift and don't want to use dynamic frameworks
+  use_frameworks!
+  pod "ORSSerialPort"
+  # Pods for IBM Wheelwriter Word Processor
+
+  target 'IBM Wheelwriter Word ProcessorTests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+  target 'IBM Wheelwriter Word ProcessorUITests' do
+    inherit! :search_paths
+    # Pods for testing
+  end
+
+end

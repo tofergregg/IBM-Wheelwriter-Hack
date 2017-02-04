@@ -14,6 +14,8 @@
 
 bool bold = false; // off to start
 bool underline = false; // off to start
+int LED = 13; // the LED light
+
 
 // on an Arduino Nano, ATmega328, the following will delay roughly 5.25us
 #define pulseDelay() { for (int i=0;i<16;i++) { __asm__ __volatile__("nop\n\t"); } }
@@ -53,6 +55,8 @@ void setup()
   pinMode(2,OUTPUT); // pin that will trigger the bus
   pinMode(3, INPUT); // listening pin
   pinMode(4, INPUT_PULLUP); // for the button
+
+  pinMode(LED, OUTPUT);
   
   // start the input pin off (meaning the bus is high, normal state)
   PORTD &= 0b11111011;
@@ -78,8 +82,10 @@ void loop()
           // 1: image bits (next two bytes will be the width and height)
           // 2: Turn on Bold
           // 3: Turn on Underline
-          // If the byte is >= 4, just treat as one character
+          // 4: Reset typewriter
+          // If the byte is >= 5, just treat as one character
           bytesRead = Serial.readBytes(buffer, 1);
+          digitalWrite(LED,1);
           //Serial.print("Read ");
           //Serial.println(bytesRead);
           //Serial.println(" bytes.");
@@ -88,14 +94,11 @@ void loop()
           
           if (command == 0) { // text to print
             // look for next two bytesp
-            // reset the typewriter so we know we are on the begining of a line
-            resetTypewriter();
             Serial.readBytes(buffer,2);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             charCount = printAllChars(buffer,bytesToPrint,charCount);
           }
           else if (command == 1) { // image to print
-            resetTypewriter();
             //Serial.println("image");
             printImage(buffer);
           } else if (command == 2) {
@@ -104,6 +107,9 @@ void loop()
           } else if (command == 3) {
             underline = !underline;
             Serial.println("ok");
+          } else if (command == 4) {
+            // reset the typewriter so we know we are on the begining of a line
+            resetTypewriter();
           } else {
             charCount = printOne(command,charCount);
           }

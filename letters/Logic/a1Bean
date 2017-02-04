@@ -1,0 +1,32 @@
+/* from typewriter output */
+sendByteOnPin(0b100100001);
+delayMicroseconds(200);
+// wait for response of 0b000000000
+
+
+sendByteOnPin(0b000001011);
+delayMicroseconds(1450);
+// wait for response of 0b000000000
+
+sendByteOnPin(0b100100001);
+delayMicroseconds(200);
+// wait for response of 0b000000000
+
+sendByteOnPin(0b000000011);
+delayMicroseconds(200);
+// wait for response of 0b000000000
+
+
+//sendByteOnPin(0b000000001); // 'a'
+//sendByteOnPin(0b001011001); // 'b'
+//sendByteOnPin(0b000000100); // 'm'
+  sendByteOnPin(letter);
+
+sendByteOnPin(0b000000001);
+delayMicroseconds(200);
+// wait for response of 0b000000000
+
+sendByteOnPin(0b000001010);
+delayMicroseconds(200);
+// wait for response of 0b000000000
+
