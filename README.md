@@ -56,7 +56,8 @@ The hardest part about making the commands work is that there isn't a clock on t
 
 # Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple. 
-See the KiCad files for full schematic (Arduino_NanoShield folder) of a Nano shield:
+See the KiCad files for full schematic (Arduino_NanoShield folder) of a Nano shield,
+or order the part directly from OSH Park (under $5):
 
 <a href="https://oshpark.com/shared_projects/HWk60tsg"><img src="https://oshpark.com/assets/badge-5b7ec47045b78aef6eb9d83b3bac6b1920de805e9a0c227658eac6e19a045b9c.png" alt="Order from OSH Park"></img></a>
 
