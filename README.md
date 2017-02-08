@@ -56,4 +56,4 @@ The hardest part about making the commands work is that there isn't a clock on t
 
 # Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple:
-![Breadboard](Breadboard.jpg?raw=true "Breadboard for IBM Wheelwriter Circuit")
+![Breadboard](Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
