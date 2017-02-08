@@ -59,6 +59,7 @@ The circuit used to connect the typewriter to an Arduino is extremely simple.
 See the KiCad files for full schematic (Arduino_NanoShield folder) of a Nano shield:
 
 <a href="https://oshpark.com/shared_projects/HWk60tsg"><img src="https://oshpark.com/assets/badge-5b7ec47045b78aef6eb9d83b3bac6b1920de805e9a0c227658eac6e19a045b9c.png" alt="Order from OSH Park"></img></a>
+
 (Note: you will need two surface-mount components for the shield: a 200 ohm 1206 resistor
 and an n-channel MOSFET (2N7002 works fine) in an SOT-23 package)
 ![Breadboard](Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
