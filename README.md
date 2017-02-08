@@ -54,4 +54,6 @@ To send commands to the typewriter, we connect one pin of the Arduino to the bus
 
 The hardest part about making the commands work is that there isn't a clock on the bus, and all commands must be timed for as close to 5.34us pulses as we can get. The Arduino is *just* barely fast enough to do this, and you have to resort to directly writing to the `PORTD` (or `PORTB`) pin registers and reading from the `PIND` (or `PINB`) registers to hit the tolerances. I.e., you can't use `digitalWrite()` or `digitalRead()` -- the commands are just too slow. The highest granularity timer we have access to on the Arduino (without going super-duper low-level) is `delayMicroseconds()`, which can come close enough to 5.34us to work, but it takes a bit of fiddling to get right. I will eventually port the code to an Arduino proper, but on the Light Blue Bean+, the tolerances don't have any wiggle room. Side note: the LBB+ has some internal ports rearranged, so `PORTD` and `PORTB` do not map to the standard Arduino pins. I've noted that in the code where necessary, and the code for the Arduino Nano has slightly different pins: pin 2 is the bus trigger through the MOSFET, and pin 3 is the bus input. Pin 4 is currently used as a button for testing.  
 
-
+# Breadboard Layout
+The circuit used to connect the typewriter to an Arduino is extremely simple:
+![Breadboard](Breadboard.jpg?raw=true "Breadboard for IBM Wheelwriter Circuit")
