@@ -11,6 +11,7 @@
 		2D20764C1E44FD1D00E8063B /* typewriter.png in Resources */ = {isa = PBXBuildFile; fileRef = 2D20764B1E44FD1D00E8063B /* typewriter.png */; };
 		2D42C0FB1E4435C2002691B9 /* underline.png in Resources */ = {isa = PBXBuildFile; fileRef = 2D42C0FA1E4435C2002691B9 /* underline.png */; };
 		2D42C0FD1E4435E5002691B9 /* bold.png in Resources */ = {isa = PBXBuildFile; fileRef = 2D42C0FC1E4435E5002691B9 /* bold.png */; };
+		2D76715F1E46BFE600C79C3C /* margins.png in Resources */ = {isa = PBXBuildFile; fileRef = 2D76715E1E46BFE600C79C3C /* margins.png */; };
 		2DE0A68A1E43B600005ED0FB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE0A6891E43B600005ED0FB /* AppDelegate.swift */; };
 		2DE0A68C1E43B600005ED0FB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE0A68B1E43B600005ED0FB /* ViewController.swift */; };
 		2DE0A68E1E43B600005ED0FB /* Document.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DE0A68D1E43B600005ED0FB /* Document.swift */; };
@@ -45,6 +46,7 @@
 		2D20764B1E44FD1D00E8063B /* typewriter.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = typewriter.png; sourceTree = "<group>"; };
 		2D42C0FA1E4435C2002691B9 /* underline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = underline.png; sourceTree = "<group>"; };
 		2D42C0FC1E4435E5002691B9 /* bold.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bold.png; sourceTree = "<group>"; };
+		2D76715E1E46BFE600C79C3C /* margins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = margins.png; sourceTree = "<group>"; };
 		2DE0A6861E43B600005ED0FB /* IBM Wheelwriter Word Processor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IBM Wheelwriter Word Processor.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2DE0A6891E43B600005ED0FB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2DE0A68B1E43B600005ED0FB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 				2D42C0FC1E4435E5002691B9 /* bold.png */,
 				2D42C0FA1E4435C2002691B9 /* underline.png */,
 				2D20764B1E44FD1D00E8063B /* typewriter.png */,
+				2D76715E1E46BFE600C79C3C /* margins.png */,
 			);
 			name = Buttons;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 				2D42C0FB1E4435C2002691B9 /* underline.png in Resources */,
 				2DE0A6901E43B600005ED0FB /* Assets.xcassets in Resources */,
 				2DE0A6931E43B600005ED0FB /* Main.storyboard in Resources */,
+				2D76715F1E46BFE600C79C3C /* margins.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
