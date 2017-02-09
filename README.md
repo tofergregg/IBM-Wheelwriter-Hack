@@ -98,6 +98,9 @@ this looks great. :)
 If anyone has any ideas on how to get the daisy wheel to print at an angle, let
 me know so I can implement italics. (/joke)  
 
+Here is a picture of the output with formatted text:
+![FormattedText](images/formatting.jpg?raw=true "Bold and Underlined Text")
+
 # Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple. 
 See the KiCad files for full schematic (Arduino_NanoShield folder) of a Nano shield,
@@ -107,4 +110,4 @@ or order the part directly from OSH Park (under $5):
 
 (Note: you will need two surface-mount components for the shield: a 200 ohm 1206 resistor
 and an n-channel MOSFET (2N7002 works fine) in an SOT-23 package)
-![Breadboard](Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
+![Breadboard](images/Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
