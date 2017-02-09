@@ -79,7 +79,7 @@ I will re-invent the wheel some more and land on a reasonable method.
 
 Here is an example of what the graphics looks like:
 
-![catImage](catImage.jpg?raw=true "Low Resolution Cat Image")
+![catImage](images/catImage.jpg?raw=true "Low Resolution Cat Image")
 
 ## Bold, underline, and other non-standard functions
 Interstingly, the Wheelwriter 6 that I have does not have bold functionality, 
