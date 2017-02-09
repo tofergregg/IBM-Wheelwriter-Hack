@@ -117,7 +117,7 @@ or order the part directly from OSH Park (under $5):
 <a href="https://oshpark.com/shared_projects/HWk60tsg"><img src="https://oshpark.com/assets/badge-5b7ec47045b78aef6eb9d83b3bac6b1920de805e9a0c227658eac6e19a045b9c.png" alt="Order from OSH Park"></img></a>
 
 (Note: you will need two surface-mount components for the shield: a 
-[200&#2126; 1206 resistor ($0.10 at Digikey)](http://www.digikey.com/product-detail/en/yageo/RC1206JR-07200RL/311-200ERCT-ND/732194)
-(and anything in the 200&#2126; range should work)
+[200&#8486; 1206 resistor ($0.10 at Digikey)](http://www.digikey.com/product-detail/en/yageo/RC1206JR-07200RL/311-200ERCT-ND/732194)
+(and anything in the 200&#8486; range should work)
 and an [n-channel MOSFET (2N7002 works fine) in an SOT-23 package, ($0.14 at Digikey)](http://www.digikey.com/product-detail/en/on-semiconductor/2N7002LT1G/2N7002LT1GOSCT-ND/917791))
 ![Breadboard](images/Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
