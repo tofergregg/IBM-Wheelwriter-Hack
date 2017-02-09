@@ -98,8 +98,8 @@ this looks great. :)
 If anyone has any ideas on how to get the daisy wheel to print at an angle, let
 me know so I can implement italics. (/joke)  
 
-For the [code]sendToNano.py program[/code], I have included a parser that
-looks for ** (bold) and __ (underline) and sends the appropriate commands
+For the `sendToNano.py` program, I have included a parser that
+looks for '**' (bold) and '__' (underline) and sends the appropriate commands
 to the typewriter to format text in this fashion.
 
 Here is a picture of the output with formatted text:
