@@ -90,10 +90,14 @@ to turn on the built-in underline functionality.
 
 Bold is a bit more interesting: because this model does not have a bold function, I
 had to play around with what bold should look like. It turns out that the best bold
-I have been able to create works like this: 1) print a character, advance the
-print head one micro-space, reprint the character, and then advance the print head
-a full character space less one microspace (to keep the spacing intact). I think
-this looks great. :)
+I have been able to create works like this:
+
+1. print a character
+2. advance the print head one micro-space
+3. reprint the character
+4. advance the print head a full character space less one microspace (to keep the spacing intact).
+
+I think the bold looks great. :)
 
 If anyone has any ideas on how to get the daisy wheel to print at an angle, let
 me know so I can implement italics. (/joke)  
