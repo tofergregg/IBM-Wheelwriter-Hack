@@ -5,15 +5,17 @@ This project has three goals:
 
 1. Electronically connect an Arduino to an IBM Wheelwriter 6 (will probably work for other models) to emulate the IBM printer option card when using a custom driver.
 2. Allow someone to type directly to the typewriter from a computer keyboard, through a computer.
-3. Add fun options, e.g., raster printing (!) at a low dpi through the use of micro-up/down and micro-backspace. (If I can figure out the code to send a micro-forward space, that would be nice, too...)
+3. Add fun options, e.g., raster printing (!) at a low dpi through the use of micro-up/down and micro-backspace.
 
+## Background
 The IBM Wheelwriter, circa 1984, is an electronic typewriter with a beautiful Model M keyboard and a daisy-wheel print head. The typewriter is (not suprisingly, given that it is an IBM) built like a tank, and the PCBs are exceedingly well laid out and annotated, and easy to access. The case pops off with a bit of elbow grease, and there is an expansion port on one of the two PCBs with labeled pins. Yay!
 
+## Technical Details
 The only pins we really care about are "bus" and ground, although eventually we'll care about 5V when we attach the Arduino and want to power it from the typewriter itself.
 
-Reverse-engineering the bus has been an interesting two-week endeavor (so far). The tools necessary: an Arduino (I'm using a Light Blue Bean+ (Update on 17 Jan 2017: I have added code for an ATmega Arduino Nano) and a logic analyzer. The initial logic analyzer I used was a Bus Pirate, but unfortunately the BP does not have enough memory to capture some of the longer sequences of commands (e.g., a carriage return). So, a colleague loaned me a Saleae 8-pin logic analyzer, which has worked great (though it does have some quirks).
+Reverse-engineering the bus has been an interesting two-week endeavor. The tools necessary: an Arduino (I'm using a Light Blue Bean+ (Update on 17 Jan 2017: I have added code for an ATmega Arduino Nano) and a logic analyzer. The initial logic analyzer I used was a Bus Pirate, but unfortunately the BP does not have enough memory to capture some of the longer sequences of commands (e.g., a carriage return). So, a colleague loaned me a Saleae 8-pin logic analyzer, which has worked great (though it does have some quirks).
 
-As of January 2016, I have successfully reverse engineered printing characters, carriage returns, fast printing of characters, print head forwards/backwards/up/down, etc. Here is the basic idea for sending a command on the bus:
+As of February 2017, I have successfully reverse engineered printing characters, carriage returns, fast printing of characters, print head forwards/backwards/up/down, etc. Here is the basic idea for sending a command on the bus:
 
 * Pulse period: 5.34us (I originally thought it was a 5.25us pulse, but after locating the 11.975MHz crystal on the PCB, I realized that 11.975MHz divided by 64 is 5.34us, which is most likely the actual period. In all of my testing I assumed it was 5.25us, and it worked fine.
 * Number of pulses sent per command: 10 (an "I'm writing to the bus" to begin, and nine more bits)
@@ -53,6 +55,44 @@ int asciiTrans[128] =
 To send commands to the typewriter, we connect one pin of the Arduino to the bus through a MOSFET transistor (I will put up a schematic soon). When we set this pin high, the bus is pulled low, indicating a zero that we want to send. We capture other devices commands with a different Arduino pin that reads the raw state of the bus.
 
 The hardest part about making the commands work is that there isn't a clock on the bus, and all commands must be timed for as close to 5.34us pulses as we can get. The Arduino is *just* barely fast enough to do this, and you have to resort to directly writing to the `PORTD` (or `PORTB`) pin registers and reading from the `PIND` (or `PINB`) registers to hit the tolerances. I.e., you can't use `digitalWrite()` or `digitalRead()` -- the commands are just too slow. The highest granularity timer we have access to on the Arduino (without going super-duper low-level) is `delayMicroseconds()`, which can come close enough to 5.34us to work, but it takes a bit of fiddling to get right. I will eventually port the code to an Arduino proper, but on the Light Blue Bean+, the tolerances don't have any wiggle room. Side note: the LBB+ has some internal ports rearranged, so `PORTD` and `PORTB` do not map to the standard Arduino pins. I've noted that in the code where necessary, and the code for the Arduino Nano has slightly different pins: pin 2 is the bus trigger through the MOSFET, and pin 3 is the bus input. Pin 4 is currently used as a button for testing.  
+
+## Graphics
+This has been one of the most fun parts of the project. I realized early on during my analysis of the 
+signals coming from the bus that the typewriter has the ability to advance the print head in very small increments,
+both horizontally and vertically. This led to the idea that I could basically turn the typewriter 
+into a slow, low-resolution dot-matrix printer by utilizing the period key as a pixel, and printing out runs of 
+dots and spaces to form images.
+
+My initial attempts involved simply breaking an image down into a grid of black-and-white pixels,
+and then sending each black pixel as a period, and each white pixel as a space. This worked, but was
+exceedingly slow (as you can imagine). For the second iteration, I re-wrote the encoding algorithm to 
+accept a [run-length-encoded](https://en.wikipedia.org/wiki/Run-length_encoding) string of periods and
+spaces, allowing me to fast-print the runs, which sped up the process considerbly. In the current
+iteration, I have updated the Arduino code to print runs of periods (as before), but also to simply
+advance the print head an equivalent number of spaces for whitespace, instead of individually
+advancing one space at a time (which sounded cool, but was slow...)
+
+At this point, the graphics printing code on the Arduino is stable, but I'm still trying to
+figure out the best way to scale images so they make sense in black and white when
+printed at (roughly) 50-dots per inch. As I write more of the front-end software, I imagine
+I will re-invent the wheel some more and land on a reasonable method.
+
+## Bold, underline, and other non-standard functions
+Interstingly, the Wheelwriter 6 that I have does not have bold functionality, 
+though it does have a built-in underline function. Not suprisingly, an underline
+is as simple as writing a character then immediately writing the underline character,
+before advancing the print head. I have manually implemented this instead of attempting
+to turn on the built-in underline functionality.
+
+Bold is a bit more interesting: because this model does not have a bold function, I
+had to play around with what bold should look like. It turns out that the best bold
+I have been able to create works like this: 1) print a character, advance the
+print head one micro-space, reprint the character, and then advance the print head
+a full character space less one microspace (to keep the spacing intact). I think
+this looks great. :)
+
+If anyone has any ideas on how to get the daisy wheel to print at an angle, let
+me know so I can implement italics. (/joke)  
 
 # Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple. 

@@ -25,6 +25,16 @@ extension NSImage {
     }
 }
 
+struct ImageAndPosition {
+    var location : Int;
+    var data : Data
+    
+    init(location: Int, data: Data) {
+        self.location = location
+        self.data = data
+    }
+}
+
 class ViewController: NSViewController, ORSSerialPortDelegate {
     // class variables for sending data
     var printData : Data!
@@ -66,27 +76,30 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
     }
     
     @IBAction func printDoc(sender: Any) {
-
-        let typewriterString = parseTextFromView()
-        
         // handle embedded images
         let attribText = fullTextView.attributedString()
 
+        print(attribText)
+        
+        var imageArray : [ImageAndPosition] = []
+        
         if (attribText.containsAttachments) {
+            // keep track of all the attachments as data for later printing
             attribText.enumerateAttribute(NSAttachmentAttributeName, in: NSMakeRange(0,attribText.length), options: NSAttributedString.EnumerationOptions(rawValue: 0), using: {(value, range, stop) in
                 if let attachment: Any = value   {
                     if let attachment = attachment as? NSTextAttachment,
                         let fileWrapper = attachment.fileWrapper,
                         let data = fileWrapper.regularFileContents {
-                        printImageToTypewriter(data: data)
+                        print("\(range.location),\(range.length)")
+                        imageArray.append(ImageAndPosition(location: range.location, data: data))
+                        //printImageToTypewriter(data: data)
                     }
                 }
             })
         }
         
-        return // (don't actually print yet)
-        // wait for image to be done
-        
+        let typewriterString = parseTextFromView()
+
         print(typewriterString)
         do {
             try sendTextToIBM(typewriterText: typewriterString)
@@ -94,6 +107,10 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         catch {
             print("Too much data (limit: 64KB)")
         }
+    }
+    
+    func sendNextPartToTypewriter() {
+        //
     }
     
     func printImageToTypewriter(data: Data) {
@@ -310,6 +327,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         } else {
             serialPort?.close()
             sendingText = false
+            sendNextPartToTypewriter()
         }
     }
     
@@ -340,6 +358,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         } else {
             serialPort?.close()
             sendingImage = false
+            sendNextPartToTypewriter()
         }
     }
     
