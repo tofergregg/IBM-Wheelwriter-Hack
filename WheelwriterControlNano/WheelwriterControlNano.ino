@@ -360,11 +360,20 @@ void printRun(uint16_t runLength, char c) {
       inFastText = false;
     }
     else {
-      if (!inFastText) {
+      if (c == ' ') {
+        // turn off fastText if it is on
+        if (inFastText) {
+          fastTextFinish();
+          inFastText = false;
+        }
+        forwardSpaces(runLength);
+
+      } else if (!inFastText) {
         fastTextInit();
         inFastText = true;
+        fastTextCharsMicro(c,runLength);
+
       }
-      fastTextCharsMicro(c,runLength);
     }
 }
 
@@ -628,8 +637,8 @@ void send_return(int numChars) {
     sendByte(0b000001101);
     sendByte(0b000000111);
     sendByte(0b100100001);
-    
-    if (numChars <= 23 || numChars >= 26) {
+
+    /*if (numChars <= 23 || numChars >= 26) {*/
         sendByte(0b000000110);
 
         // We will send two bytes from a 10-bit number
@@ -644,7 +653,7 @@ void send_return(int numChars) {
         sendByte(0b100100001);
         // right now, the platten is moving, maybe?
 
-    } else if (numChars <= 25) {
+    /*} else if (numChars <= 25) {
         // not sure why this is so different
         sendByte(0b000001101);
         sendByte(0b000000111);
@@ -654,7 +663,7 @@ void send_return(int numChars) {
         sendByte(numChars * 10);
         sendByte(0b100100001);
         // right now, the platten is moving, maybe?
-    }
+    }*/
     
     sendByte(0b000000101);
     sendByte(0b010010000);
@@ -732,7 +741,7 @@ void forwardSpaces(int num_microspaces) {
     sendByte(0b010000000);
     //sendByte(0b001111100);
     sendByte(num_microspaces * 3);
-    delay(LETTER_DELAY + LETTER_DELAY / 10 * num_microspaces / 5);
+    //delay(LETTER_DELAY + LETTER_DELAY / 10 * num_microspaces / 5);
 }
 
 void spin() {

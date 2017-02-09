@@ -171,6 +171,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         }
         runs.append([0, 0, 0]) // end of image
         runData = runs
+        print(runData)
         sendImageToIBM(runs: runs)
     }
     
@@ -332,9 +333,9 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
                     dataToSend.append(d[2])
                 }
             }
-            for d in dataToSend {
-                print (d)
-            }
+            //for d in dataToSend {
+            //    print (d)
+            //}
             serialPort?.send(dataToSend)
         } else {
             serialPort?.close()
@@ -371,7 +372,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         // the serial port is opened...)
         let delayInSeconds = 1.5
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInSeconds) {
-            serialPort.send(Data(bytes: [0x04])) // reset typewriter
+            //serialPort.send(Data(bytes: [0x04])) // reset typewriter
             if self.sendingText {
                 serialPort.send(self.header)
                 self.sendTextToArduino()
