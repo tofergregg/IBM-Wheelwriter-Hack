@@ -25,6 +25,13 @@ As of February 2017, I have successfully reverse engineered printing characters,
 * When a device sends its 10 bits on the bus, there is almost always a response from the motor driver PCB (that's what I'm calling it), and this response is usually a 10-byte zero (a 53.4us zero pulse, basically). We need to look for this response before sending the next 10-bit value in our command.
 * The reason I am somewhat hesitant to declare the MSB/LSB debate finished is because the character table is completely whacky. It is not ASCII, and it isn't any of the EBCDIC variations I've tracked down. You might think that there would be some method to it, but I haven't yet figured it out. The table below is what I have so far; as you can see, the characters A, B, C have character codes 0x20, 0x12, and 0x1b. I have a feeling that the codes might be based off of the keyboard scan codes, but I haven't found the pattern yet.
 
+* The following is the Arduino array mapping ASCII to the characters the printer expects.
+I haven't figured out what encoding the typewriter expects, and capturing this data was
+an exercise in patience and a lot of "type a key, look at the bit pattern" (which I
+automated to every extent possible!). Note: this is the mapping for the __Prestige Elite 12P__
+daisy wheel -- I will eventually get a Courier printwheel to see what characters need to be
+modified (e.g., there are no curly braces in the Prestige Elite font).
+
 <pre>
 int asciiTrans[128] = 
 //col: 0     1     2     3     4     5     6     7     8     9     a     b     c     d     e     f     row:
