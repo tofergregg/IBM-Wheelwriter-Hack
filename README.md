@@ -109,12 +109,12 @@ to the typewriter to format text in this fashion.
 Here is a picture of the output with formatted text:
 ![FormattedText](images/formatting.jpg?raw=true "Bold and Underlined Text")
 
-# Breadboard Layout
+## Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple. 
 
 ![Breadboard](images/Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
 
-# Nano Shield PCB
+## Nano Shield PCB
 
 See the KiCad files for full schematic ([hardware/Arduino_NanoShield folder](hardware/Arduino_NanoShield)) of a Nano shield,
 or order the part directly from OSH Park (under $6 for three copies):
