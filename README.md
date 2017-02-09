@@ -111,6 +111,11 @@ Here is a picture of the output with formatted text:
 
 # Breadboard Layout
 The circuit used to connect the typewriter to an Arduino is extremely simple. 
+
+![Breadboard](images/Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
+
+# Nano Shield PCB
+
 See the KiCad files for full schematic ([hardware/Arduino_NanoShield folder](hardware/Arduino_NanoShield)) of a Nano shield,
 or order the part directly from OSH Park (under $6 for three copies):
 
@@ -128,5 +133,3 @@ the computer controls the typewriter, so it will be connected...
 
 Of course, you also need to be
 able to [solder surface mount components](https://www.sparkfun.com/tutorials/category/2).
-
-![Breadboard](images/Breadboard.png?raw=true "Breadboard for IBM Wheelwriter Circuit")
