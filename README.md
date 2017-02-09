@@ -120,6 +120,11 @@ or order the part directly from OSH Park (under $6 for three copies):
 [200&#8486; 1206 resistor ($0.10 at Digikey)](http://www.digikey.com/product-detail/en/yageo/RC1206JR-07200RL/311-200ERCT-ND/732194)
 (and anything in the 200&#8486; range should work), 
 and an [n-channel MOSFET (2N7002 works fine) in an SOT-23 package, ($0.14 at Digikey)](http://www.digikey.com/product-detail/en/on-semiconductor/2N7002LT1G/2N7002LT1GOSCT-ND/917791)).
+If you want a proper connector for the typewriter interface, [you can get one, too ($0.56 at DigiKey)](https://www.digikey.com/product-detail/en/molex-connector-corporation/0050579310/WM5289-ND/2731451)
+
+Note: you do __not__ need to connect the 5V to the typewriter (indeed, do not, or you risk electrical issues);
+I put that onto the board in case someone did not want to connect the Arduino through USB. But, USB is how
+the computer controls the typewriter, so it will be connected...
 
 Of course, you also need to be
 able to [solder surface mount components](https://www.sparkfun.com/tutorials/category/2).
