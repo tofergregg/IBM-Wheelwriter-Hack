@@ -77,6 +77,10 @@ figure out the best way to scale images so they make sense in black and white wh
 printed at (roughly) 50-dots per inch. As I write more of the front-end software, I imagine
 I will re-invent the wheel some more and land on a reasonable method.
 
+Here is an example of what the graphics looks like:
+
+![catImage](catImage.jpg?raw=true "Low Resolution Cat Image")
+
 ## Bold, underline, and other non-standard functions
 Interstingly, the Wheelwriter 6 that I have does not have bold functionality, 
 though it does have a built-in underline function. Not suprisingly, an underline
