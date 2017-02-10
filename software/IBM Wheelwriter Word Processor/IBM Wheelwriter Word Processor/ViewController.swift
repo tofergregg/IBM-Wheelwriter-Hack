@@ -35,11 +35,23 @@ struct ImageAndPosition {
     }
 }
 
+enum TypeOfPrintData {
+    case text
+    case image
+}
+
+struct DataToPrint {
+    var typeOfData : TypeOfPrintData
+    var data : Data
+}
+
 class ViewController: NSViewController, ORSSerialPortDelegate {
     // class variables for sending data
     var printData : Data!
     var header : Data!
     var runData : [[UInt8]]!
+    
+    var allPrintData : [DataToPrint]!
     
     var serialPort: ORSSerialPort?
     
@@ -78,8 +90,64 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
     @IBAction func printDoc(sender: Any) {
         // handle embedded images
         let attribText = fullTextView.attributedString()
-
+        print("attribs:")
         print(attribText)
+        print("about to print attribs")
+        
+        var lastAttribWasAttachment = false;
+        var currentString = ""
+        attribText.enumerateAttributes(in: NSMakeRange(0,attribText.length), options: NSAttributedString.EnumerationOptions(rawValue: 0), using: {(value, range, stop) in
+            
+            // options:
+            if let attachment = value["NSAttachment"] as? NSTextAttachment,
+                let fileWrapper = attachment.fileWrapper,
+                let data = fileWrapper.regularFileContents {
+                // 1. It is an attachment (image)
+                if (currentString != "") {
+                    print("current string:'\(currentString)'")
+                }
+                
+                print("attachment")
+                lastAttribWasAttachment = true;
+            } else if let bold = value["NSFont"] as? NSFont {
+                var partialString = ""
+                if (bold.fontName.contains("Bold")) {
+                    // 2. It is bold
+                    if value["NSUnderline"] != nil {
+                        // 2a. It is also underlined
+                        partialString = "BU"+attribText.attributedSubstring(from: range).string+"UB"
+                        //print("bold and underlined:'\(text)'")
+                        
+                    } else {
+                        // 2b. It is bold but not underlined
+                        partialString = "B"+attribText.attributedSubstring(from: range).string+"B"
+                        //print("bold:'\(text)'")
+                    }
+                } else {
+                    if value["NSUnderline"] != nil {
+                        // 3. It is underlined but not bold
+                        partialString = "U"+attribText.attributedSubstring(from: range).string+"U"
+                        //print("underlined:'\(text)'")
+                    } else {
+                        // 4. It is neither bold nor underlined
+                        partialString = attribText.attributedSubstring(from: range).string
+                        //print("regular:'\(text)'")
+                    }
+                }
+                if lastAttribWasAttachment {
+                    currentString = partialString
+                } else {
+                    currentString += partialString
+                }
+                lastAttribWasAttachment = false;
+            }
+            //print("value:\(value), range:\(range.location), length:\(range.length)")
+        })
+        if !lastAttribWasAttachment {
+            print("current string:'\(currentString)'")
+        }
+        //print(attribText)
+
         
         var imageArray : [ImageAndPosition] = []
         
