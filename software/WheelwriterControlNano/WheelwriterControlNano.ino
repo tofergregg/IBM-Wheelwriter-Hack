@@ -14,6 +14,7 @@
 
 bool bold = false; // off to start
 bool underline = false; // off to start
+bool reverseText = false; // for printing in reverse
 int LED = 13; // the LED light
 
 
@@ -80,9 +81,12 @@ void loop()
           // 0: next two bytes will be the number of characters we are going
           //    to send
           // 1: image bits (next two bytes will be the width and height)
-          // 2: Turn on Bold
-          // 3: Turn on Underline
+          // 2: Toggle Bold
+          // 3: Toggle Underline
           // 4: Reset typewriter
+          // 5: Toggle reverse printing
+          // 6: TBA
+          // 7: Beep typewriter (traditional 0x07 beep char)
           // If the byte is >= 5, just treat as one character
           bytesRead = Serial.readBytes(buffer, 1);
           digitalWrite(LED,1);
@@ -110,7 +114,20 @@ void loop()
           } else if (command == 4) {
             // reset the typewriter so we know we are on the begining of a line
             resetTypewriter();
-          } else {
+            bold = underline = reverseText = false;
+            Serial.println("ok");
+          } else if (command == 5) {
+            // toggle reverse printing
+            reverseText = !reverseText;
+            Serial.println("ok");
+          } else if (command == 6) {
+            // reserved for future use
+            Serial.println("ok");
+          } else if (command == 7) {
+            beepTypewriter(); 
+            Serial.println("ok");
+          }
+          else {
             charCount = printOne(command,charCount);
           }
           digitalWrite(LED,0); // turn off LED when we are finished processing
@@ -283,7 +300,14 @@ int printAllChars(char buffer[],
                     fastPrinting = true;
                 }
                 fastTextChars(buffer + bufferPos, 1);
-                charCount++;
+                if (reverseText) {
+                    charCount--;
+                    if (charCount < 0) {
+                      charCount = 0;
+                    }
+                } else {
+                    charCount++;
+                }
           } else {
             if (fastPrinting) {
               fastTextFinish();
@@ -623,7 +647,7 @@ void backspace_no_correct() {
     // send one more byte but don't wait explicitly for the response
     // of 0b000000100
     sendByteOnPin(0b000001011);*/
-    delay(LETTER_DELAY / 10); // a bit more time
+    //delay(LETTER_DELAY / 10); // a bit more time
 }
 
 void send_return(int numChars) {
@@ -819,7 +843,13 @@ void fastTextChars(char *s, int length) {
             sendByte(0b000001001);
         }
         else {
+            if (reverseText) {
+                sendByte(0); // no forward space
+                micro_backspace(0b1010); // full space back
+            } else {
+            // full space
             sendByte(0b000001010);
+            }
         }
     }
 }
@@ -887,4 +917,14 @@ void resetTypewriter() {
   sendByte(0b000000001);
 }
 
+void beepTypewriter() {
+  spin();
+  // not currently working
+  /*
+  sendByte(0b100100001);
+  sendByte(0b000001011);
+  sendByte(0b100100001);
+  sendByte(0b000001011);
+  */
+}
 
