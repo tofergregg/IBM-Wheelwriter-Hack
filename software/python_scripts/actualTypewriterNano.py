@@ -27,6 +27,7 @@ import sys
 
 # if HARDCODED_PORT is '', the user will be given a choice
 HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+#HARDCODED_PORT=''
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
