@@ -1,6 +1,9 @@
 # IBM-Wheelwriter-Hack
 Turning an IBM Wheelwriter into a unique printer
 
+Video:
+[![Wheelwriter Printer Video](https://img.youtube.com/vi/0vrvDQmZcPI/0.jpg)](https://www.youtube.com/watch?v=0vrvDQmZcPI)
+
 This project has three goals:
 
 1. Electronically connect an Arduino to an IBM Wheelwriter 6 (will probably work for other models) to emulate the IBM printer option card when using a custom driver.
