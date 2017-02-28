@@ -1,7 +1,7 @@
 # IBM-Wheelwriter-Hack
 Turning an IBM Wheelwriter into a unique printer
 
-Video:
+Video:<br>
 [![Wheelwriter Printer Video](https://img.youtube.com/vi/0vrvDQmZcPI/0.jpg)](https://www.youtube.com/watch?v=0vrvDQmZcPI)
 
 This project has three goals:
