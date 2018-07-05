@@ -69,6 +69,7 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
+      static int microspaceCount = 0;
       char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
@@ -94,13 +95,14 @@ void loop()
           //Serial.println(bytesRead);
           //Serial.println(" bytes.");
           char command = buffer[0];
-          //Serial.println(int(command));
+          Serial.println(int(command));
           
           if (command == 0) { // text to print
             // look for next two bytesp
             Serial.readBytes(buffer,3);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             int spacing = buffer[2];
+            microspaceCount += bytesToPrint * spacing / 2;
             charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
@@ -126,6 +128,14 @@ void loop()
           } else if (command == 7) {
             beepTypewriter(); 
             Serial.println("ok");
+          } else if (command == '\n') {
+                // read the number of spaces
+                Serial.readBytes(buffer,2);
+                int microspacesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
+                //Serial.println("newline");
+                //Serial.println(microspacesToPrint);
+                send_return_microspaces(microspacesToPrint / 2);
+                microspaceCount = 0;
           }
           else {
             charCount = printOne(command,charCount);
@@ -325,6 +335,7 @@ int printAllChars(char buffer[],
                     fastPrinting = true;
                 }
                 fastTextChars(buffer + bufferPos, 1, spacing);
+
                 if (reverseText) {
                     charCount--;
                     if (charCount < 0) {
@@ -708,6 +719,60 @@ void send_return(int numChars) {
     // calculations for further down
     int byte1 = (numChars * 5) >> 7;
     int byte2 = ((numChars * 5) & 0x7f) << 1;
+    
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000111);
+    sendByte(0b100100001);
+
+    /*if (numChars <= 23 || numChars >= 26) {*/
+        sendByte(0b000000110);
+
+        // We will send two bytes from a 10-bit number
+        // which is numChars * 5. The top three bits
+        // of the 10-bit number comprise the first byte,
+        // and the remaining 7 bits comprise the second
+        // byte, although the byte needs to be shifted
+        // left by one (not sure why)
+        // the numbers are calculated above for timing reasons
+        sendByte(byte1);
+        sendByte(byte2); // each char is worth 10
+        sendByte(0b100100001);
+        // right now, the platten is moving, maybe?
+
+    /*} else if (numChars <= 25) {
+        // not sure why this is so different
+        sendByte(0b000001101);
+        sendByte(0b000000111);
+        sendByte(0b100100001);
+        sendByte(0b000000110);
+        sendByte(0b000000000);
+        sendByte(numChars * 10);
+        sendByte(0b100100001);
+        // right now, the platten is moving, maybe?
+    }*/
+    
+    sendByte(0b000000101);
+    sendByte(0b010010000);
+
+    /*
+    sendByte(0b100100001);
+    
+
+    // send one more byte but don't wait explicitly for the response
+    // of 0b001010000
+    sendByteOnPin(0b000001011);*/
+
+    // wait for carriage 
+    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
+}
+
+void send_return_microspaces(int numSpaces) {
+    // calculations for further down
+    int byte1 = (numSpaces) >> 7;
+    int byte2 = ((numSpaces) & 0x7f) << 1;
     
     sendByte(0b100100001);
     sendByte(0b000001011);

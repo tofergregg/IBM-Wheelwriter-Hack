@@ -104,25 +104,32 @@ fileLen = len(remainingText)
 # sent in little-endian format
 stringHeader = chr(0x00) + chr(fileLen & 0xff) + chr(fileLen >> 8) + chr(spacing)
 
-try:
-        # read MAXLINE characters at a time and send
-    while len(remainingText) > 0:
-        chars = remainingText[:MAXLINE]
-        remainingText = remainingText[MAXLINE:]
-        if chars == '':
-            break
-        ser.write(stringHeader + chars)
-        stringHeader = ''  # not needed any more
-        sys.stdout.write(chars)
-        sys.stdout.flush()
-        response = ""
-        while True:
-            response += ser.read(10)
-            #print("resp:"+response)
-            if len(response) > 0 and response[-1] == '\n':
-                # print("(bytes written:"+response.rstrip()+")")
+if remainingText[0] == '\n':
+    if (spacing % 2 == 1):
+        spacing += 1
+    ser.write('\n' + chr(spacing & 0xff) + chr(spacing >> 8));
+    intext = ser.read()
+    print(intext)
+else:
+    try:
+            # read MAXLINE characters at a time and send
+        while len(remainingText) > 0:
+            chars = remainingText[:MAXLINE]
+            remainingText = remainingText[MAXLINE:]
+            if chars == '':
                 break
-            time.sleep(0.1)
-except KeyboardInterrupt:
-    pass
+            ser.write(stringHeader + chars)
+            stringHeader = ''  # not needed any more
+            sys.stdout.write(chars)
+            sys.stdout.flush()
+            response = ""
+            while True:
+                response += ser.read(10)
+                #print("resp:"+response)
+                if len(response) > 0 and response[-1] == '\n':
+                    # print("(bytes written:"+response.rstrip()+")")
+                    break
+                time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
 ser.close()
