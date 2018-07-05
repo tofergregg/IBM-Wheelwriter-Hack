@@ -91,7 +91,7 @@ try:
 #        ser.write(''.join([chr(x) for x in run]))
         print("Sent " + str(run))
         response = ""
-'''        while True:
+        while True:
             response += ser.read(10)
             print(response)
             if len(response) > 0 and '\n' in response:
@@ -100,7 +100,7 @@ try:
             time.sleep(0.01)
         if "timeout" in response or "done" in response:
             print(response)
-            break'''
+            break
 except KeyboardInterrupt:
     pass
 ser.close()

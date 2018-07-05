@@ -69,7 +69,7 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      char buffer[65];
+      char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
       uint8_t bufferPos = 0;
@@ -84,7 +84,7 @@ void loop()
           // 2: Toggle Bold
           // 3: Toggle Underline
           // 4: Reset typewriter
-          // 5: Toggle reverse printing
+          // 5: TBA
           // 6: TBA
           // 7: Beep typewriter (traditional 0x07 beep char)
           // If the byte is >= 5, just treat as one character
@@ -117,8 +117,7 @@ void loop()
             bold = underline = reverseText = false;
             Serial.println("ok");
           } else if (command == 5) {
-            // toggle reverse printing
-            reverseText = !reverseText;
+            // reserved for future use
             Serial.println("ok");
           } else if (command == 6) {
             // reserved for future use
@@ -232,6 +231,12 @@ int printOne(int charToPrint, int charCount) {
         // TODO: FIX THIS ISSUE
         micro_backspace(1);
     }
+    else if (charToPrint == 132) { // micro-forwardspace
+        // DOES NOT UPDATE CHARCOUNT!
+        // THIS WILL CAUSE PROBLEMS WITH RETURN!
+        // TODO: FIX THIS ISSUE
+        forwardSpaces(1);
+    }
     else {
         //Serial.println("about to print");
         send_letter(asciiTrans[charToPrint]);
@@ -265,7 +270,7 @@ int printAllChars(char buffer[],
         // wait for more bytes, but only wait up to 5 seconds
         unsigned long startTime = millis();
         bool timeout = false; 
-        while (Serial.available() == 0 and not timeout) {
+        while (not Serial.available() and not timeout) {
           if (millis() - startTime > 5000) {
             timeout = true;
           }
@@ -292,6 +297,23 @@ int printAllChars(char buffer[],
           }
           else if (buffer[bufferPos] == 3) { // underline
               underline = !underline;
+          }
+          else if (buffer[bufferPos] == 5) { // reverse instruction
+              // we might need to read in more of the command, which
+              // is four bytes long
+              int bytesToRead = 4 - (bytesRead - bufferPos);
+              while (bytesToRead > 0) {
+                  // read necessary bytes
+                  int extraBytesRead = Serial.readBytes(buffer+bytesRead, bytesToRead);
+                  bytesRead += extraBytesRead;
+                  bytesToRead -= extraBytesRead;
+              }
+              // now we have enough bytes
+              int print_dir = buffer[bufferPos+1];
+              int numSpaces = buffer[bufferPos+2];
+              int spacesDir = buffer[bufferPos+3];
+              bufferPos += 4;
+              // 
           }
           else if (buffer[bufferPos] != '\r' and buffer[bufferPos] != '\n') {
                 // begin fast printing

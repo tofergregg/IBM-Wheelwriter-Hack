@@ -26,8 +26,8 @@ import availablePorts
 import sys
 
 # if HARDCODED_PORT is '', the user will be given a choice
-HARDCODED_PORT = '/dev/tty.wchusbserial1410'
-#HARDCODED_PORT=''
+#HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+HARDCODED_PORT=''
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
@@ -40,6 +40,7 @@ if __name__ == "__main__":
 
         if len(ports) == 1:
             # just choose the first
+            print("Choosing " + ports[0])
             portChoice = ports[0]
         else:
             if portChoiceInt == 0:
@@ -70,6 +71,8 @@ if __name__ == "__main__":
         screen.addstr("Please start typing! (ctrl-c or ctrl-d to quit)\n")
         while True:
             event = screen.getch()
+            # screen.addstr("("+str(event)+")")
+            # continue
             if event == curses.KEY_UP:
                 event = 128  # special char for typewriter
             elif event == curses.KEY_DOWN:
@@ -82,8 +85,14 @@ if __name__ == "__main__":
                 event = 0x7f
             elif event == 0x7f:  # already backspace
                 pass
-            elif event == 393:  # shift left-arrow for micro-backspace
+            elif event == 339:  # fn-up for micro-up
+                event = 21 
+            elif event == 339:  # fn-down for micro-down
+                event = 4
+            elif event == 262:  # fn-left-arrow for micro-backspace
                 event = 131
+            elif event == 360:  # fn-left-arrow for micro-forward
+                event = 132
             elif event == 21:
                 screen.addstr('(underline)')
                 event = 3 # convert to code for underline

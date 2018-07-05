@@ -160,13 +160,15 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
                         let data = fileWrapper.regularFileContents {
                         print("\(range.location),\(range.length)")
                         imageArray.append(ImageAndPosition(location: range.location, data: data))
-                        //printImageToTypewriter(data: data)
+                        sendingImage = true
+                        sendingText = false
+                        printImageToTypewriter(data: data)
                     }
                 }
             })
         }
         
-        let typewriterString = parseTextFromView()
+        /*let typewriterString = parseTextFromView()
 
         print(typewriterString)
         do {
@@ -174,7 +176,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         }
         catch {
             print("Too much data (limit: 64KB)")
-        }
+        }*/
     }
     
     func sendNextPartToTypewriter() {
@@ -376,7 +378,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
     }
     
     func sendImageToIBM(runs : [[UInt8]]) {
-        self.serialPort = ORSSerialPort(path: "/dev/tty.wchusbserial1410")
+        self.serialPort = ORSSerialPort(path: "/dev/tty.wchusbserial1420")
         serialPort?.baudRate = 115200
         self.serialPort?.delegate = self
         sendingImage = true
@@ -458,6 +460,7 @@ class ViewController: NSViewController, ORSSerialPortDelegate {
         // Arduino can start the sketch (it gets reset every time
         // the serial port is opened...)
         let delayInSeconds = 1.5
+        //sendingText = false // remove later
         DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + delayInSeconds) {
             //serialPort.send(Data(bytes: [0x04])) // reset typewriter
             if self.sendingText {

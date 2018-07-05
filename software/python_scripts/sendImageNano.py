@@ -18,7 +18,8 @@ import availablePorts
 MAXWIDTH = 500
 
 # if HARDCODED_PORT is '' then the user will be given a choice
-HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+#HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+HARDCODED_PORT = ''
 
 if len(sys.argv) != 2:
     print("Usage:\n\t./sendImage image [port choice]")
@@ -36,6 +37,7 @@ if HARDCODED_PORT == '':
 
     if len(ports) == 1:
         # just choose the first
+        print("Choosing: " + ports[0])
         portChoice = ports[0]
     else:
         if portChoiceInt == 0:

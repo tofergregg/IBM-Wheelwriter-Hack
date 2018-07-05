@@ -15,9 +15,6 @@ import availablePorts
 import serial
 
 def parseMarkdown(text):
-    BOLD_CODE = chr(2) # will be sent to arduino to toggle bold
-    UNDERLINE_CODE = chr(3) # sent to arduino to toggle underline
-    REVERSE_CODE = chr(5)
     '''We are looking for __underline__ and **bold**
        text. Nothing fancy, and we are expecting that
        the markdown will be perfect (e.g., missing tags
@@ -25,7 +22,12 @@ def parseMarkdown(text):
        The basic idea: __ toggles underline and
        ** toggles bold. Either can be escaped with
        a leading backslash ('\').
+
+       We are also going to parse the text for newlines, and
+       reverse the text at each newline. Newlines just become: 
     '''
+    BOLD_CODE = chr(2) # will be sent to arduino to toggle bold
+    UNDERLINE_CODE = chr(3) # sent to arduino to toggle underline
     parsedText = ''
     escaped = False
     skipnext = False
@@ -56,9 +58,69 @@ def parseMarkdown(text):
             parsedText += c
     return parsedText
 
+def placeReverses(text):
+    """This function places reverse markers
+       into the text, based on line breaks.
+       The algorithm will find a return,
+       then determine if the print head
+       is closer to the left or the end
+       of the next line of text.
+       It will then output REVERSE_CODE,
+       then a 0 to indicate we will be printing
+       in the forwards direction, 1 for reverse printing.
+       Then one byte for the number of spaces to go
+       forward or backwards after the newline, 
+       and another 0 for backwards spaces, or 1
+       for forward spaces
+    """
+    REVERSE_CODE = chr(5)
+    FORWARDS = chr(0)
+    BACKWARDS = chr(1)
+    # break text by newline
+    textLines = text.split('\n')
+
+    # assume we are starting forwards
+    outputText = '' 
+    goingForwards = True
+    headLocation = 0
+    for idx,line in enumerate(textLines):
+        outputText += line
+        # remove non-printing characters for length
+        # calculation (e.g., bold, underline, etc.)
+        # all characters below 31 are non-printing
+        line = ''.join([x for x in line if ord(x) > 31])
+        if goingForwards:
+            headLocation += len(line)
+        else:
+            headLocation -= len(line)
+        # now, we do math to figure out where the
+        # printhead should go
+        if idx < len(textLines)-1: # nothing for last line
+            nextLineLen = len(textLines[idx+1])
+            # go in the direction closest to one end
+            diff = nextLineLen - headLocation
+            if diff > headLocation:
+                # too close to beginning, so just
+                # go back to the beginning and
+                # print forwards
+                outputText += REVERSE_CODE + FORWARDS + chr(headLocation) + BACKWARDS
+                #               rev code^  print dir^   num spaces^          ^ spaces are backwards
+                headLocation = 0
+                goingForwards = True
+            else:
+                # go to end of the line, and print backwards
+                if diff < 0: # forward spaces
+                    # note: diff can't be bigger than 255
+                    outputText += REVERSE_CODE + BACKWARDS + chr(-diff) + FORWARDS
+                else:
+                    outputText += REVERSE_CODE + BACKWARDS + chr(diff) + BACKWARDS
+                headLocation = nextLineLen
+                goingForwars = False
+    return outputText
+
 MAXLINE = 40
 # if HARDCODED_PORT is '', then the user will get a choice
-HARDCODED_PORT = '/dev/tty.wchusbserial1410'
+HARDCODED_PORT = '/dev/tty.wchusbserial1420'
 
 if len(sys.argv) == 1:
     print("Usage:\n\ttextToBean filename [port choice]")
@@ -93,6 +155,11 @@ with open(filePath, "r") as f:
 # parse markdown, only looking for __text__ for underline
 # and **text** for bold
 remainingText = parseMarkdown(allText)
+
+# add reversing
+remainingText = placeReverses(remainingText)
+print(remainingText)
+quit()
 
 # set up serial port
 ser = serial.Serial(portChoice, 115200, timeout=0.1)
