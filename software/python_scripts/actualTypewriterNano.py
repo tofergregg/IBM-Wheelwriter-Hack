@@ -87,8 +87,8 @@ if __name__ == "__main__":
                 pass
             elif event == 339:  # fn-up for micro-up
                 event = 21 
-            elif event == 339:  # fn-down for micro-down
-                event = 4
+            elif event == 338:  # fn-down for micro-down
+                event = 133
             elif event == 262:  # fn-left-arrow for micro-backspace
                 event = 131
             elif event == 360:  # fn-left-arrow for micro-forward

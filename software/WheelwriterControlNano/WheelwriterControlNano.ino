@@ -98,9 +98,10 @@ void loop()
           
           if (command == 0) { // text to print
             // look for next two bytesp
-            Serial.readBytes(buffer,2);
+            Serial.readBytes(buffer,3);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
-            charCount = printAllChars(buffer,bytesToPrint,charCount);
+            int spacing = buffer[2];
+            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -212,7 +213,7 @@ int printOne(int charToPrint, int charCount) {
     else if (charToPrint == 128 or charToPrint == 129) {
         paper_vert((charToPrint == 128 ? 0 : 1),8); // full line up/down
     }
-    else if (charToPrint == 4) { // micro-down, ctrl-d is 4
+    else if (charToPrint == 133) { // micro-down, ctrl-d is 4
         paper_vert(1,1);
     }
     else if (charToPrint == 21) { // micro-up, ctrl-u is 21
@@ -239,7 +240,9 @@ int printOne(int charToPrint, int charCount) {
     }
     else {
         //Serial.println("about to print");
-        send_letter(asciiTrans[charToPrint]);
+        //send_letter(asciiTrans[charToPrint]);
+        send_letter_without_space(asciiTrans[charToPrint]);
+
         charCount++;
     }
     
@@ -254,7 +257,7 @@ int printOne(int charToPrint, int charCount) {
 
 int printAllChars(char buffer[], 
                   uint16_t bytesToPrint, 
-                  int charCount) {
+                  int charCount, int spacing) {
     uint8_t readLength = 65;
     bool fastPrinting = false;
     uint16_t bytesPrinted = 0;
@@ -321,7 +324,7 @@ int printAllChars(char buffer[],
                     fastTextInit();
                     fastPrinting = true;
                 }
-                fastTextChars(buffer + bufferPos, 1);
+                fastTextChars(buffer + bufferPos, 1, spacing);
                 if (reverseText) {
                     charCount--;
                     if (charCount < 0) {
@@ -595,6 +598,35 @@ void send_letter(int letter) {
     //delay(LETTER_DELAY); // before next character
 }
 
+void send_letter_without_space(int letter) {
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000000011);
+    sendByte(letter);
+    if (underline) {
+      sendByte(0b000000000); // no space
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000011);
+      sendByte(asciiTrans['_']);
+    }
+    if (bold) {
+      sendByte(0b000000001); // one microspace
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000011);
+      sendByte(letter);
+      sendByte(0b000001001);
+    } else {
+      // not bold
+      sendByte(0b000000000); // spacing for one character
+    }
+    //delay(LETTER_DELAY); // before next character
+}
+
 void letterNoSpace(int letter) {
     sendByte(0b100100001);
     sendByte(0b000001011);
@@ -839,7 +871,7 @@ void fastTextInit() {
     sendByte(0b010000000);
     sendByte(0b000000000);
 }
-void fastTextChars(char *s, int length) {
+void fastTextChars(char *s, int length, int spacing) {
     // letters start here
     for (int i=0; i < length; i++) {
         sendByte(0b100100001);
@@ -870,7 +902,8 @@ void fastTextChars(char *s, int length) {
                 micro_backspace(0b1010); // full space back
             } else {
             // full space
-            sendByte(0b000001010);
+            //sendByte(0b000001010);
+            sendByte(spacing);
             }
         }
     }
