@@ -120,22 +120,35 @@ void loop()
             bold = underline = reverseText = false;
             Serial.println("ok");
           } else if (command == 5) {
-            // reserved for future use
-            Serial.println("ok");
+            // position cursor horizontally and vertically from current position
+            // we expect four more bytes, as follows:
+            // byte 0: little end of 2-byte horizontal value
+            // byte 1: big end of 2-byte horizontal value
+            //
+            // byte 2: little end of 2-byte vertical value
+            // byte 3: big end of 2-byte vertical value
+
+            // Values above 32767 will be considered negative, so we just subtract 32768
+            
+            Serial.readBytes(buffer,4);
+            int horizontal = buffer[0] + (buffer[1] << 8); // little-endian
+            if (horizontal > 32767) {
+              horizontal -= 32768; // convert to negative
+            }
+            int vertical = buffer[2] + (buffer[3] << 8); // little endian
+            if (vertical > 32767) {
+              vertical -= 32768;
+            }
+
+            moveCursor(horizontal,vertical);
+            Serial.println("moved cursor by " + String(horizontal) + 
+                "horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
             // reserved for future use
             Serial.println("ok");
           } else if (command == 7) {
             beepTypewriter(); 
             Serial.println("ok");
-          } else if (command == '\n') {
-                // read the number of spaces
-                Serial.readBytes(buffer,2);
-                int microspacesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
-                //Serial.println("newline");
-                //Serial.println(microspacesToPrint);
-                send_return_microspaces(microspacesToPrint / 2);
-                microspaceCount = 0;
           }
           else {
             charCount = printOne(command,charCount);
@@ -1047,4 +1060,18 @@ void beepTypewriter() {
   sendByte(0b000001011);
   */
 }
+
+void moveCursor(int horizontal, int vertical) {
+   // move horizontally first
+   if (horizontal > 0) {
+     forwardSpaces(horizontal);
+   } else {
+     micro_backspace(horizontal);
+   }
+
+   // move vertically
+   // (forgot why these commands are not symmetrical...)
+   paper_vert(vertical > 0 ? 4 : 21, vertical);
+}
+
 

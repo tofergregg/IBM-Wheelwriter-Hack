@@ -61,7 +61,7 @@ MAXLINE = 40
 HARDCODED_PORT = ''
 
 if len(sys.argv) == 1:
-    print('Usage:\n\t%s "text to print" [microspacing] [serialPort]"')
+    print('Usage:\n\t%s "text to print" [microspacing] [serialPort]"'% sys.argv[0])
     quit()
 
 allText = sys.argv[1]
