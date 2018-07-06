@@ -70,7 +70,7 @@ void loop()
 {
       static int charCount = 0;
       static int microspaceCount = 0;
-      char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
+      unsigned char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
       uint8_t bufferPos = 0;
@@ -95,7 +95,7 @@ void loop()
           //Serial.println(bytesRead);
           //Serial.println(" bytes.");
           char command = buffer[0];
-          Serial.println(int(command));
+          //Serial.println(int(command));
           
           if (command == 0) { // text to print
             // look for next two bytesp
@@ -103,7 +103,7 @@ void loop()
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             int spacing = buffer[2];
             microspaceCount += bytesToPrint * spacing / 2;
-            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
+            //charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -128,21 +128,16 @@ void loop()
             // byte 2: little end of 2-byte vertical value
             // byte 3: big end of 2-byte vertical value
 
-            // Values above 32767 will be considered negative, so we just subtract 32768
+            // Negative values will be in two's complement format for 16-bit int values
             
             Serial.readBytes(buffer,4);
             int horizontal = buffer[0] + (buffer[1] << 8); // little-endian
-            if (horizontal > 32767) {
-              horizontal -= 32768; // convert to negative
-            }
-            int vertical = buffer[2] + (buffer[3] << 8); // little endian
-            if (vertical > 32767) {
-              vertical -= 32768;
-            }
 
-            moveCursor(horizontal,vertical);
+            int vertical = buffer[2] + (buffer[3] << 8); // little endian
+
+            //moveCursor(horizontal,vertical);
             Serial.println("moved cursor by " + String(horizontal) + 
-                "horizontal microspaces and " + String(vertical) + " vertical microspaces");
+                " horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
             // reserved for future use
             Serial.println("ok");
@@ -171,52 +166,9 @@ void loop()
         digitalWrite(13,1); // led
         delay(100);
         digitalWrite(13,0);    
-        resetTypewriter();
-
-        //print_str("aaaaaaaaaaaa");
-        
-        /*print_str("This is the symphony that schubert never finished!");
-        send_return(50);
-
-        print_str("\"the quick brown fox jumps over the lazy dog.\"");
-        send_return(46);*/
-
-        /*print_str("ABC");
-        send_return(3);
-
-        print_str("55555");
-        send_return(5);
-
-        print_str("1234567890");
-        send_return(10);
-        
-        print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-        send_return(26);
-
-        print_str("1234567890");
-        send_return(10);
-
-        print_str(",./?");
-        send_return(4);*/
-
-        //print_str("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
-        //send_return(52);
-
-        //print_str("done.");
-        //send_return(5);
-
-        //print_strln("The quick brown fox jumps over the lazy dog.");
-        /*
-        sendByteOnPin(0b00000000);
-        delayMicroseconds(60);*/
-        /////////////
-        //PORTD &= 0b11111011;
-        //Bean.setLed(255, 0, 0);
-        //Bean.sleep(10);
-        //Bean.setLed(0,0,0); 
+        resetTypewriter(); 
       }
       delay(10);
-      //Bean.sleep(10);  
 }
 
 int printOne(int charToPrint, int charCount) {

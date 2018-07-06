@@ -122,7 +122,7 @@ try:
             response += ser.read(10)
             #print("resp:"+response)
             if len(response) > 0 and response[-1] == '\n':
-                # print("(bytes written:"+response.rstrip()+")")
+                print("response: "+response)
                 break
             time.sleep(0.1)
 except KeyboardInterrupt:
