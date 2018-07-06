@@ -69,7 +69,6 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      static int microspaceCount = 0;
       char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
@@ -95,15 +94,13 @@ void loop()
           //Serial.println(bytesRead);
           //Serial.println(" bytes.");
           char command = buffer[0];
-          Serial.println(int(command));
+          //Serial.println(int(command));
           
           if (command == 0) { // text to print
             // look for next two bytesp
-            Serial.readBytes(buffer,3);
+            Serial.readBytes(buffer,2);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
-            int spacing = buffer[2];
-            microspaceCount += bytesToPrint * spacing / 2;
-            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
+            charCount = printAllChars(buffer,bytesToPrint,charCount);
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -128,14 +125,6 @@ void loop()
           } else if (command == 7) {
             beepTypewriter(); 
             Serial.println("ok");
-          } else if (command == '\n') {
-                // read the number of spaces
-                Serial.readBytes(buffer,2);
-                int microspacesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
-                //Serial.println("newline");
-                //Serial.println(microspacesToPrint);
-                send_return_microspaces(microspacesToPrint / 2);
-                microspaceCount = 0;
           }
           else {
             charCount = printOne(command,charCount);
@@ -223,7 +212,7 @@ int printOne(int charToPrint, int charCount) {
     else if (charToPrint == 128 or charToPrint == 129) {
         paper_vert((charToPrint == 128 ? 0 : 1),8); // full line up/down
     }
-    else if (charToPrint == 133) { // micro-down, ctrl-d is 4
+    else if (charToPrint == 4) { // micro-down, ctrl-d is 4
         paper_vert(1,1);
     }
     else if (charToPrint == 21) { // micro-up, ctrl-u is 21
@@ -250,9 +239,7 @@ int printOne(int charToPrint, int charCount) {
     }
     else {
         //Serial.println("about to print");
-        //send_letter(asciiTrans[charToPrint]);
-        send_letter_without_space(asciiTrans[charToPrint]);
-
+        send_letter(asciiTrans[charToPrint]);
         charCount++;
     }
     
@@ -267,7 +254,7 @@ int printOne(int charToPrint, int charCount) {
 
 int printAllChars(char buffer[], 
                   uint16_t bytesToPrint, 
-                  int charCount, int spacing) {
+                  int charCount) {
     uint8_t readLength = 65;
     bool fastPrinting = false;
     uint16_t bytesPrinted = 0;
@@ -334,8 +321,7 @@ int printAllChars(char buffer[],
                     fastTextInit();
                     fastPrinting = true;
                 }
-                fastTextChars(buffer + bufferPos, 1, spacing);
-
+                fastTextChars(buffer + bufferPos, 1);
                 if (reverseText) {
                     charCount--;
                     if (charCount < 0) {
@@ -609,35 +595,6 @@ void send_letter(int letter) {
     //delay(LETTER_DELAY); // before next character
 }
 
-void send_letter_without_space(int letter) {
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    sendByte(0b100100001);
-    sendByte(0b000000011);
-    sendByte(letter);
-    if (underline) {
-      sendByte(0b000000000); // no space
-      sendByte(0b100100001);
-      sendByte(0b000001011);
-      sendByte(0b100100001);
-      sendByte(0b000000011);
-      sendByte(asciiTrans['_']);
-    }
-    if (bold) {
-      sendByte(0b000000001); // one microspace
-      sendByte(0b100100001);
-      sendByte(0b000001011);
-      sendByte(0b100100001);
-      sendByte(0b000000011);
-      sendByte(letter);
-      sendByte(0b000001001);
-    } else {
-      // not bold
-      sendByte(0b000000000); // spacing for one character
-    }
-    //delay(LETTER_DELAY); // before next character
-}
-
 void letterNoSpace(int letter) {
     sendByte(0b100100001);
     sendByte(0b000001011);
@@ -719,60 +676,6 @@ void send_return(int numChars) {
     // calculations for further down
     int byte1 = (numChars * 5) >> 7;
     int byte2 = ((numChars * 5) & 0x7f) << 1;
-    
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    sendByte(0b100100001);
-    sendByte(0b000001101);
-    sendByte(0b000000111);
-    sendByte(0b100100001);
-
-    /*if (numChars <= 23 || numChars >= 26) {*/
-        sendByte(0b000000110);
-
-        // We will send two bytes from a 10-bit number
-        // which is numChars * 5. The top three bits
-        // of the 10-bit number comprise the first byte,
-        // and the remaining 7 bits comprise the second
-        // byte, although the byte needs to be shifted
-        // left by one (not sure why)
-        // the numbers are calculated above for timing reasons
-        sendByte(byte1);
-        sendByte(byte2); // each char is worth 10
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-
-    /*} else if (numChars <= 25) {
-        // not sure why this is so different
-        sendByte(0b000001101);
-        sendByte(0b000000111);
-        sendByte(0b100100001);
-        sendByte(0b000000110);
-        sendByte(0b000000000);
-        sendByte(numChars * 10);
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-    }*/
-    
-    sendByte(0b000000101);
-    sendByte(0b010010000);
-
-    /*
-    sendByte(0b100100001);
-    
-
-    // send one more byte but don't wait explicitly for the response
-    // of 0b001010000
-    sendByteOnPin(0b000001011);*/
-
-    // wait for carriage 
-    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
-}
-
-void send_return_microspaces(int numSpaces) {
-    // calculations for further down
-    int byte1 = (numSpaces) >> 7;
-    int byte2 = ((numSpaces) & 0x7f) << 1;
     
     sendByte(0b100100001);
     sendByte(0b000001011);
@@ -936,7 +839,7 @@ void fastTextInit() {
     sendByte(0b010000000);
     sendByte(0b000000000);
 }
-void fastTextChars(char *s, int length, int spacing) {
+void fastTextChars(char *s, int length) {
     // letters start here
     for (int i=0; i < length; i++) {
         sendByte(0b100100001);
@@ -967,8 +870,7 @@ void fastTextChars(char *s, int length, int spacing) {
                 micro_backspace(0b1010); // full space back
             } else {
             // full space
-            //sendByte(0b000001010);
-            sendByte(spacing);
+            sendByte(0b000001010);
             }
         }
     }
@@ -1047,4 +949,5 @@ void beepTypewriter() {
   sendByte(0b000001011);
   */
 }
+
 
