@@ -6,7 +6,7 @@
          sending data
  */
 
-//#include<PinChangeInt.h>
+#include <EEPROM.h>
 
 #define LETTER_DELAY 450
 #define CARRIAGE_WAIT_BASE 200
@@ -16,7 +16,6 @@ bool bold = false; // off to start
 bool underline = false; // off to start
 bool reverseText = false; // for printing in reverse
 int LED = 13; // the LED light
-
 
 // on an Arduino Nano, ATmega328, the following will delay roughly 5.25us
 #define pulseDelay() { for (int i=0;i<16;i++) { __asm__ __volatile__("nop\n\t"); } }
@@ -45,7 +44,9 @@ byte asciiTrans[128] =
      
 //     p     q     r     s     t     u     v     w     x     y     z     {     |     }     ~    DEL
      0x5c, 0x52, 0x03, 0x06, 0x5e, 0x5b, 0x53, 0x55, 0x51, 0x58, 0x54, 0x00, 0x00, 0x00, 0x00, 0x00}; // 7
-     
+
+int microspaceCount = 0;
+
 void setup() 
 {
   // initialize serial communication at 115200 bits per second:
@@ -63,18 +64,19 @@ void setup()
   PORTD &= 0b11111011;
 
   //resetTypewriter(); // Arduino resets whenever a new serial connection is made...
+  microspaceCount = readMicrospacesFromEEPROM();
+
 }
 
 // the loop routine runs over and over again forever:
 void loop() 
 {
       static int charCount = 0;
-      static int microspaceCount = 0;
       unsigned char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
       uint8_t bufferPos = 0;
-      uint16_t bytesToPrint; 
+      uint16_t bytesToPrint;
 
       if (Serial.available() > 0) {
           // read one byte, and see if it is a command
@@ -98,11 +100,13 @@ void loop()
           //Serial.println(int(command));
           
           if (command == 0) { // text to print
-            // look for next two bytesp
+            // look for next two bytes
             Serial.readBytes(buffer,3);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             int spacing = buffer[2];
-            microspaceCount += bytesToPrint * spacing / 2;
+            microspaceCount = microspaceCount + bytesToPrint * spacing;
+            writeMicrospacesToEEPROM(microspaceCount);
+            Serial.println(microspaceCount);
             //charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
@@ -116,9 +120,10 @@ void loop()
             Serial.println("ok");
           } else if (command == 4) {
             // reset the typewriter so we know we are on the begining of a line
-            resetTypewriter();
+            //resetTypewriter();
+            writeMicrospacesToEEPROM(0);
             bold = underline = reverseText = false;
-            Serial.println("ok");
+            Serial.println("reset");
           } else if (command == 5) {
             // position cursor horizontally and vertically from current position
             // we expect four more bytes, as follows:
@@ -139,8 +144,13 @@ void loop()
             Serial.println("moved cursor by " + String(horizontal) + 
                 " horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
-            // reserved for future use
-            Serial.println("ok");
+            // returns the cursor to the beginning of the line, based on microspaceCount
+            //moveCursor(-microspaceCount, 0);
+            Serial.print("sent cursor to beginning of line with ");
+            Serial.print(-microspaceCount);
+            Serial.println(" microspaces");
+            writeMicrospacesToEEPROM(0);
+            microspaceCount = 0;
           } else if (command == 7) {
             beepTypewriter(); 
             Serial.println("ok");
@@ -252,7 +262,6 @@ int printAllChars(char buffer[],
           if (millis() - startTime > 5000) {
             timeout = true;
           }
-          //Bean.sleep(10);
           delay(10);
         }
         if (timeout) {
@@ -1024,6 +1033,16 @@ void moveCursor(int horizontal, int vertical) {
    // move vertically
    // (forgot why these commands are not symmetrical...)
    paper_vert(vertical > 0 ? 4 : 21, vertical);
+}
+
+int readMicrospacesFromEEPROM() {
+    return EEPROM.read(0) + (EEPROM.read(1) << 8);
+}
+
+void writeMicrospacesToEEPROM(int m) {
+    // write little endian to bytes 0,1
+    EEPROM.update(0,m & 0xff);
+    EEPROM.update(1,(m >> 8) & 0xff);
 }
 
 
