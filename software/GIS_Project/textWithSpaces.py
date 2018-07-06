@@ -61,32 +61,34 @@ MAXLINE = 40
 HARDCODED_PORT = ''
 
 if len(sys.argv) == 1:
-    print("Usage:\n\ttextToBean filename [port choice]")
+    print('Usage:\n\t%s "text to print" [microspacing] [serialPort]"')
     quit()
 
 allText = sys.argv[1]
 spacing = int(sys.argv[2])
 if len(sys.argv) > 3:
-    portChoiceInt = int(sys.argv[2])
+    portChoice = sys.argv[3]
 else:
+    portChoice = None
     portChoiceInt = 0
 # choose port
-if HARDCODED_PORT == '':
-    ports = availablePorts.serial_ports()
+if portChoice == None:
+    if HARDCODED_PORT == '':
+        ports = availablePorts.serial_ports()
 
-    if len(ports) == 1:
-        # just choose the first
-        print("Choosing: " + ports[0])
-        portChoice = ports[0]
-    else:
-        if portChoiceInt == 0:
-            print("Please choose a port:")
-            for idx,p in enumerate(ports):
-                print("\t"+str(idx+1)+") "+p)
-            portChoiceInt = int(input())
-        portChoice = ports[portChoiceInt-1]
-else:
-    portChoice = HARDCODED_PORT
+        if len(ports) == 1:
+            # just choose the first
+            print("Choosing: " + ports[0])
+            portChoice = ports[0]
+        else:
+            if portChoiceInt == 0:
+                print("Please choose a port:")
+                for idx,p in enumerate(ports):
+                    print("\t"+str(idx+1)+") "+p)
+                portChoiceInt = int(input())
+            portChoice = ports[portChoiceInt-1]
+    else: 
+        portChoice = HARDCODED_PORT
 
 # parse markdown, only looking for __text__ for underline
 # and **text** for bold
@@ -97,39 +99,32 @@ ser = serial.Serial(portChoice, 115200, timeout=0.1)
 # wait a bit
 time.sleep(2)
 
-# get the file length
-fileLen = len(remainingText) 
+# get the text length
+textLen = len(remainingText) 
 
 # first two bytes are the file length (max: 65K)
 # sent in little-endian format
-stringHeader = chr(0x00) + chr(fileLen & 0xff) + chr(fileLen >> 8) + chr(spacing)
+stringHeader = chr(0x00) + chr(textLen & 0xff) + chr(textLen >> 8) + chr(spacing)
 
-if remainingText[0] == '\n':
-    if (spacing % 2 == 1):
-        spacing += 1
-    ser.write('\n' + chr(spacing & 0xff) + chr(spacing >> 8));
-    intext = ser.read()
-    print(intext)
-else:
-    try:
-            # read MAXLINE characters at a time and send
-        while len(remainingText) > 0:
-            chars = remainingText[:MAXLINE]
-            remainingText = remainingText[MAXLINE:]
-            if chars == '':
+try:
+    # read MAXLINE characters at a time and send
+    while len(remainingText) > 0:
+        chars = remainingText[:MAXLINE]
+        remainingText = remainingText[MAXLINE:]
+        if chars == '':
+            break
+        ser.write(stringHeader + chars)
+        stringHeader = ''  # not needed any more
+        sys.stdout.write(chars)
+        sys.stdout.flush()
+        response = ""
+        while True:
+            response += ser.read(10)
+            #print("resp:"+response)
+            if len(response) > 0 and response[-1] == '\n':
+                # print("(bytes written:"+response.rstrip()+")")
                 break
-            ser.write(stringHeader + chars)
-            stringHeader = ''  # not needed any more
-            sys.stdout.write(chars)
-            sys.stdout.flush()
-            response = ""
-            while True:
-                response += ser.read(10)
-                #print("resp:"+response)
-                if len(response) > 0 and response[-1] == '\n':
-                    # print("(bytes written:"+response.rstrip()+")")
-                    break
-                time.sleep(0.1)
-    except KeyboardInterrupt:
-        pass
+            time.sleep(0.1)
+except KeyboardInterrupt:
+    pass
 ser.close()
