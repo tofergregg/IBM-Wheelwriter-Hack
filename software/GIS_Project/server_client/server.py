@@ -9,6 +9,7 @@ import serial
 import availablePorts
 
 DATA_AMOUNT = 1024
+MAXLINE = 40
 
 def sendBytes(ser, bytesToSend):
     try:
@@ -23,6 +24,11 @@ def sendBytes(ser, bytesToSend):
             time.sleep(0.1)
     except KeyboardInterrupt:
         pass
+    except Exception as ex:
+        print("Exception in sendBytes.")
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        print(message)
     return response
 
 def moveCursor(ser, horizontal, vertical):
@@ -52,7 +58,7 @@ def moveCursor(ser, horizontal, vertical):
 
 def resetTypewriter(ser):
     bytesToSend = chr(0x04) 
-    response = sendBytes(bytesToSend)
+    response = sendBytes(ser, bytesToSend)
 
     #response = "Typewriter reset."
     print(response)
@@ -60,13 +66,14 @@ def resetTypewriter(ser):
 
 def returnCursor(ser):
     bytesToSend = chr(0x06)
-    response = sendBytes(bytesToSend)
+    response = sendBytes(ser, bytesToSend)
+    print("in returnCursor")
 
     #response="Returned cursor to beginning of line."
     print(response)
     return response
 
-def sendCharacters(ser, string_to_print, spacing):
+def sendCharacters(ser, stringToPrint, spacing):
     # get the text length
     textLen = len(stringToPrint) 
 
@@ -143,7 +150,11 @@ def runServer(ser):
                     # print('sending "%s" to typewriter' % args)
                     connection.sendall('\0')
                     break
-
+        except Exception as ex:
+            print("Exception in runServer.") 
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(ex).__name__, ex.args)
+            print(message)
         finally:
             # Clean up the connection
             connection.close()
@@ -182,11 +193,16 @@ def setupSerial():
     ser = serial.Serial(portChoice, 115200, timeout=0.1)
     # wait a bit
     time.sleep(2)
+    return ser
 
 if __name__ == '__main__':
     try:
         ser = setupSerial()
         runServer(ser)
+    except Exception as ex:
+         template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+         message = template.format(type(ex).__name__, ex.args)
+         print(message)
     finally:
         print("Closing serial connection.")
         ser.close()

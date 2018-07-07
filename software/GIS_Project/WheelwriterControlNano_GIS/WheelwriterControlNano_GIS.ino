@@ -64,7 +64,7 @@ void setup()
   PORTD &= 0b11111011;
 
   //resetTypewriter(); // Arduino resets whenever a new serial connection is made...
-  microspaceCount = readMicrospacesFromEEPROM();
+  //microspaceCount = readMicrospacesFromEEPROM();
 
 }
 
@@ -72,6 +72,7 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
+      static int microspaceCount = 0;
       unsigned char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
@@ -105,7 +106,7 @@ void loop()
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             int spacing = buffer[2];
             microspaceCount = microspaceCount + bytesToPrint * spacing;
-            writeMicrospacesToEEPROM(microspaceCount);
+            //writeMicrospacesToEEPROM(microspaceCount);
             Serial.println(microspaceCount);
             //charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
@@ -121,7 +122,7 @@ void loop()
           } else if (command == 4) {
             // reset the typewriter so we know we are on the begining of a line
             //resetTypewriter();
-            writeMicrospacesToEEPROM(0);
+            //writeMicrospacesToEEPROM(0);
             bold = underline = reverseText = false;
             Serial.println("reset");
           } else if (command == 5) {
@@ -141,6 +142,7 @@ void loop()
             int vertical = buffer[2] + (buffer[3] << 8); // little endian
 
             //moveCursor(horizontal,vertical);
+            microspaceCount += horizontal;
             Serial.println("moved cursor by " + String(horizontal) + 
                 " horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
@@ -149,7 +151,7 @@ void loop()
             Serial.print("sent cursor to beginning of line with ");
             Serial.print(-microspaceCount);
             Serial.println(" microspaces");
-            writeMicrospacesToEEPROM(0);
+            //writeMicrospacesToEEPROM(0);
             microspaceCount = 0;
           } else if (command == 7) {
             beepTypewriter(); 
@@ -1035,6 +1037,7 @@ void moveCursor(int horizontal, int vertical) {
    paper_vert(vertical > 0 ? 4 : 21, vertical);
 }
 
+/*
 int readMicrospacesFromEEPROM() {
     return EEPROM.read(0) + (EEPROM.read(1) << 8);
 }
@@ -1044,5 +1047,6 @@ void writeMicrospacesToEEPROM(int m) {
     EEPROM.update(0,m & 0xff);
     EEPROM.update(1,(m >> 8) & 0xff);
 }
+*/
 
 
