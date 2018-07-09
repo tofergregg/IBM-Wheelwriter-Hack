@@ -26,7 +26,7 @@ def sendBytes(ser, bytesToSend):
         while True:
             response += ser.read(10)
             #print("resp:"+response)
-            if len(response) > 0 and response[-1] == '\n':
+            if len(response) > 0 and response[-1] == '\0':
                 print("response:"+response)
                 break
             time.sleep(0.1)
@@ -111,8 +111,8 @@ def sendCharacters(ser, stringToPrint, spacing):
             ser.write(bytearray(stringHeader + chars,'utf-8'))
             stringHeader = ''  # not needed any more
             if len(stringToPrint) > 0:
-                print("sleeping")
-                print("to print: " + stringToPrint)
+                #print("sleeping")
+                #print("to print: " + stringToPrint)
                 time.sleep(3) # wait for characters to print
             #sys.stdout.write(chars)
             #sys.stdout.flush()
@@ -120,14 +120,14 @@ def sendCharacters(ser, stringToPrint, spacing):
         while True:
             response += ser.read(10).decode('utf-8')
             #print("resp:"+response)
-            if len(response) > 0 and response[-1] == '\n':
-                print("response: ")
+            if len(response) > 0 and response[-1] == '\0':
+                response = response[:-1] # remove null
                 break
             time.sleep(0.1)
     except KeyboardInterrupt:
         pass
 
-    #response='Typed "%s" with spacing %d.' % (string_to_print, spacing)
+    print("response: ")
     print(response)
     return response
 
