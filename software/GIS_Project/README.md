@@ -88,7 +88,7 @@ Sends -100 horizontal microspaces (left) and 25 vertical microspaces (down):<p>
 
   * `microspaces`:<p> 
     * usage:<p>
-    `./send_command.py microspaces [-h]
+    `./send_command.py microspaces [-h]`
 
     * description:<p>
     Prints the number of microspaces that the typewriter thinks have occurred so far on a line.
