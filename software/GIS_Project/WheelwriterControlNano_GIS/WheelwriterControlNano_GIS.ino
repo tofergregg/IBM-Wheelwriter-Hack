@@ -107,8 +107,9 @@ void loop()
             int spacing = buffer[2];
             microspaceCount = microspaceCount + bytesToPrint * spacing;
             //writeMicrospacesToEEPROM(microspaceCount);
+            Serial.print("microspaceCount: ");
             Serial.println(microspaceCount);
-            //charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
+            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -121,8 +122,9 @@ void loop()
             Serial.println("ok");
           } else if (command == 4) {
             // reset the typewriter so we know we are on the begining of a line
-            //resetTypewriter();
+            resetTypewriter();
             //writeMicrospacesToEEPROM(0);
+            microspaceCount = 0;
             bold = underline = reverseText = false;
             Serial.println("reset");
           } else if (command == 5) {
@@ -141,13 +143,13 @@ void loop()
 
             int vertical = buffer[2] + (buffer[3] << 8); // little endian
 
-            //moveCursor(horizontal,vertical);
+            moveCursor(horizontal,vertical);
             microspaceCount += horizontal;
             Serial.println("moved cursor by " + String(horizontal) + 
                 " horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
             // returns the cursor to the beginning of the line, based on microspaceCount
-            //moveCursor(-microspaceCount, 0);
+            moveCursor(-microspaceCount, 0);
             Serial.print("sent cursor to beginning of line with ");
             Serial.print(-microspaceCount);
             Serial.println(" microspaces");
@@ -156,6 +158,10 @@ void loop()
           } else if (command == 7) {
             beepTypewriter(); 
             Serial.println("ok");
+          } else if (command == 8) {
+            // report on microspaceCount
+            Serial.print("microspaceCount: ");
+            Serial.println(microspaceCount);
           }
           else {
             charCount = printOne(command,charCount);
@@ -276,7 +282,7 @@ int printAllChars(char buffer[],
           break;
         }
         bytesRead = Serial.readBytes(buffer, readLength-1);
-        Serial.println(bytesRead);
+        //Serial.println(bytesRead);
         bufferPos = 0;
         while (bufferPos < bytesRead) {
           // print all the bytes
@@ -637,8 +643,8 @@ void letterMicrospace(int letter) {
 void paper_vert(int direction) {
   // 0 == up
   // 1 == down
-  // 4 == micro-down
-  // 21 == micro-up
+  // 4 == micro-down (paper down)
+  // 21 == micro-up (paper up)
   sendByte(0b100100001);
   sendByte(0b000001011);
   sendByte(0b100100001);
@@ -661,15 +667,29 @@ void paper_vert(int direction) {
 void paper_vert(int direction, int microspaces) {
     // 0 == up
     // 1 == down
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    sendByte(0b100100001);
-    sendByte(0b000000101);
-    sendByte((direction << 7) | (microspaces << 1));
-    
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    //delay(LETTER_DELAY + LETTER_DELAY / 10 * microspaces/5);
+
+    // can only send up to 127 at a time
+    while (microspaces > 127) {
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000101);
+      //sendByte((direction << 7) | (microspaces << 1));
+      sendByte((direction << 7) | 127);
+  
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      
+      delay(LETTER_DELAY);
+      microspaces -= 127;
+    }
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000000101);
+      sendByte((direction << 7) | microspaces);
+      sendByte(0b100100001);
+      sendByte(0b000001011);
 }
 
 void backspace_no_correct() {
@@ -820,21 +840,37 @@ void correct_letter(int letter) {
 
 void micro_backspace(int microspaces) {
     // 10 microspaces is one space
-    sendByte(0b100100001);
-    sendByte(0b000001110);
-    sendByte(0b011010000);
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    sendByte(0b100100001);
-    sendByte(0b000001101);
-    sendByte(0b000000100);
-    sendByte(0b100100001);
-    sendByte(0b000000110);
-    sendByte(0b000000000);
-    //sendByte(microspaces * 3);
-    sendByte(microspaces);
-    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * microspaces / 5);
-    //sendByte(0b000000010);
+
+    // max is 255
+    while (microspaces > 255) {
+      sendByte(0b100100001);
+      sendByte(0b000001110);
+      sendByte(0b011010000);
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000001101);
+      sendByte(0b000000100);
+      sendByte(0b100100001);
+      sendByte(0b000000110);
+      sendByte(0b000000000);
+      sendByte(0xff);
+      delay(LETTER_DELAY);
+      microspaces -= 255;
+      //sendByte(0b000000010);
+    }
+      sendByte(0b100100001);
+      sendByte(0b000001110);
+      sendByte(0b011010000);
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000001101);
+      sendByte(0b000000100);
+      sendByte(0b100100001);
+      sendByte(0b000000110);
+      sendByte(0b000000000);
+      sendByte(microspaces);
     /*
     sendByte(0b100100001);
     
@@ -844,23 +880,41 @@ void micro_backspace(int microspaces) {
     sendByteOnPin(0b000001011);*/
 }
 
-void forwardSpaces(int num_microspaces) {
-    // five microspaces is one real space
-    sendByte(0b100100001);
-    sendByte(0b000001110);
-    sendByte(0b010010110);
-    sendByte(0b100100001);
-    sendByte(0b000001011);
-    sendByte(0b100100001);
-    sendByte(0b000001101);
-    sendByte(0b000000110);
-    sendByte(0b100100001);
-    sendByte(0b000000110);
-    
-    sendByte(0b010000000);
-    //sendByte(0b001111100);
-    sendByte(num_microspaces * 3);
-    //delay(LETTER_DELAY + LETTER_DELAY / 10 * num_microspaces / 5);
+void forwardSpaces(int microspaces) {
+    // ten microspaces is one real space
+    // max is 255
+    while (microspaces > 255) {
+      sendByte(0b100100001);
+      sendByte(0b000001110);
+      sendByte(0b010010110);
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000001101);
+      sendByte(0b000000110);
+      sendByte(0b100100001);
+      sendByte(0b000000110);
+      
+      sendByte(0b010000000);
+      //sendByte(0b001111100);
+      sendByte(0xff);
+      delay(LETTER_DELAY);
+      microspaces-=255;
+    }
+      sendByte(0b100100001);
+      sendByte(0b000001110);
+      sendByte(0b010010110);
+      sendByte(0b100100001);
+      sendByte(0b000001011);
+      sendByte(0b100100001);
+      sendByte(0b000001101);
+      sendByte(0b000000110);
+      sendByte(0b100100001);
+      sendByte(0b000000110);
+      
+      sendByte(0b010000000);
+      //sendByte(0b001111100);
+      sendByte(microspaces);
 }
 
 void spin() {
@@ -1029,12 +1083,16 @@ void moveCursor(int horizontal, int vertical) {
    if (horizontal > 0) {
      forwardSpaces(horizontal);
    } else {
-     micro_backspace(horizontal);
+     micro_backspace(-horizontal);
    }
 
    // move vertically
    // (forgot why these commands are not symmetrical...)
-   paper_vert(vertical > 0 ? 4 : 21, vertical);
+   if (vertical > 0) {
+    paper_vert(1,vertical);
+   } else {
+    paper_vert(0,-vertical);
+   }
 }
 
 /*

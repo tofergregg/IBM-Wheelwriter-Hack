@@ -67,7 +67,14 @@ def resetTypewriter(ser):
 def returnCursor(ser):
     bytesToSend = chr(0x06)
     response = sendBytes(ser, bytesToSend)
-    print("in returnCursor")
+
+    #response="Returned cursor to beginning of line."
+    print(response)
+    return response
+
+def getMicrospaces(ser):
+    bytesToSend = chr(0x08)
+    response = sendBytes(ser, bytesToSend)
 
     #response="Returned cursor to beginning of line."
     print(response)
@@ -90,14 +97,14 @@ def sendCharacters(ser, stringToPrint, spacing):
                 break
             ser.write(bytearray(stringHeader + chars,'utf-8'))
             stringHeader = ''  # not needed any more
-            sys.stdout.write(chars)
-            sys.stdout.flush()
+            #sys.stdout.write(chars)
+            #sys.stdout.flush()
             response = ""
             while True:
                 response += ser.read(10).decode('utf-8')
                 #print("resp:"+response)
                 if len(response) > 0 and response[-1] == '\n':
-                    print("response: "+response)
+                    print("response: ")
                     break
                 time.sleep(0.1)
     except KeyboardInterrupt:
@@ -121,7 +128,8 @@ def runServer(ser):
 
     while True:
         # Wait for a connection
-        print('waiting for a connection')
+        print('Ready to receive commands!')
+        print('Waiting for a connection')
         connection, client_address = sock.accept()
         fullData = ''
         try:
@@ -144,6 +152,8 @@ def runServer(ser):
                         reply = returnCursor(ser)
                     elif args['command'] == 'characters':
                         reply = sendCharacters(ser, args['string_to_print'],args['spacing'])
+                    elif args['command'] == 'microspaces':
+                        reply = getMicrospaces(ser)
                     else:
                         reply = "not a known command"
                     connection.sendall(reply)
@@ -161,6 +171,7 @@ def runServer(ser):
             print
 
 def setupSerial():
+    print("Setting up...")
     # if HARDCODED_PORT is '', then the user will get a choice
     #HARDCODED_PORT = '/dev/tty.wchusbserial1410'
     HARDCODED_PORT = ''

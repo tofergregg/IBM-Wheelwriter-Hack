@@ -36,10 +36,13 @@ def getArgs():
     parser_c = subparsers.add_parser('reset', help='reset help')
 
     # create the parser for the "movecursor" command
-    parser_c = subparsers.add_parser('movecursor', help='movecursor help')
-    parser_c.add_argument("horizontal", type=int, help="horizontal microspaces, positive is right, negative is left")
-    parser_c.add_argument("vertical", type=int, help="vertical microspaces, positive is down, negative is up")
+    parser_d = subparsers.add_parser('movecursor', help='movecursor help')
+    parser_d.add_argument("horizontal", type=int, help="horizontal microspaces, positive is right, negative is left")
+    parser_d.add_argument("vertical", type=int, help="vertical microspaces, positive is down, negative is up")
 
+    # create the parser for the "reset" command
+    parser_e = subparsers.add_parser('microspaces', help='microspaces help')
+    
     return vars(parser.parse_args())
 
 def setup_connection():
@@ -96,6 +99,10 @@ if __name__ == "__main__":
     elif args['command'] == "reset":
         print('Reseting typewriter.')
     elif args['command'] == "movecursor":
+        # note: 10 microspaces horizontally is normal spacing
+        #       and 8 microspaces vertically is 1 line spacing
         print('Moving cursor %d microspaces horizontally and %d microspaces vertically.' % (args['horizontal'],args['vertical']))
+    elif args['command'] == "microspaces":
+        print("Querying for current number of microspaces.")
     send_command(args)
 
