@@ -149,7 +149,11 @@ void loop()
                 " horizontal microspaces and " + String(vertical) + " vertical microspaces");
           } else if (command == 6) {
             // returns the cursor to the beginning of the line, based on microspaceCount
-            moveCursor(-microspaceCount, 0);
+            // also moves the cursor vertically by the amount given in the next two bytes
+            Serial.readBytes(buffer,2);
+            int vertical = buffer[0] + (buffer[1] << 8); // little endian
+            
+            moveCursor(-microspaceCount, vertical);
             Serial.print("sent cursor to beginning of line with ");
             Serial.print(-microspaceCount);
             Serial.println(" microspaces");

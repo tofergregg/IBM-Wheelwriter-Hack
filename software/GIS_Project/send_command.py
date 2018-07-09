@@ -31,6 +31,7 @@ def getArgs():
 
     # create the parser for the "return" command
     parser_b = subparsers.add_parser('return', help='return help')
+    parser_b.add_argument("vertical", type=int,default=16, nargs='?')
 
     # create the parser for the "reset" command
     parser_c = subparsers.add_parser('reset', help='reset help')

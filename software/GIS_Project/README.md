@@ -32,10 +32,10 @@ The following commands are available:
 
   * `return`:<p>
     * usage:<p>
-    `./send_command.py return [-h]`
+    `./send_command.py return [-h] [vertical]`
 
     * description:<p>
-    Sends the typewriter cursor back to the beginning of the line, based on an internal count of microspaces that have happened so far. See the `microspaces` command below to determine the number of microspaces that the typewriter has counted.
+    Sends the typewriter cursor back to the beginning of the line, based on an internal count of microspaces that have happened so far. See the `microspaces` command below to determine the number of microspaces that the typewriter has counted. The default value for `vertical` is 16 microspaces, which is normal one-line linespacing. The `vertical` argument can be positive (down), negative (up), or zero to simply move the cursor to the beginning of the line.
 
     * notes:<p>
     The number of microspaces may not be correct, but usually is. A mistake can occur if someone types something on the typewriter keyboard after already typing something, or if the server is stopped and restarted (which resets the number of microspaces to zero). See the `reset` command below to guarantee moving the cursor to the beginning of the line.
@@ -56,7 +56,7 @@ The following commands are available:
     `./send_command.py movecursor [-h] horizontal vertical`
 
     * description:<p>
-    Moves the cursor horizontally and vertically a given number of microspaces. A positive `horizontal` value is to the right, and a negative value is to the left. A positive `vertical` value is down, and a negative value is up. E.g., `./send_command.py movecursor 100 40` will move the cursor 100 microspaces to the right, and 40 microspaces down. Ten horizontal microspaces is normal text, and 8 vertical microspaces is a line-spacing of one.
+    Moves the cursor horizontally and vertically a given number of microspaces. A positive `horizontal` value is to the right, and a negative value is to the left. A positive `vertical` value is down, and a negative value is up. E.g., `./send_command.py movecursor 100 40` will move the cursor 100 microspaces to the right, and 40 microspaces down. Ten horizontal microspaces is normal text, and sixteen vertical microspaces is a line-spacing of one.
     
     * notes:<p>
       * Both horizontal and vertical arguments must be given, but either can be 0. For example, `./send_command.py movecursor 0 10` advances down by ten microspaces, but does not move horizontally.

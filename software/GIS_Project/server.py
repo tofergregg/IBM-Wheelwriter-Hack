@@ -72,8 +72,13 @@ def resetTypewriter(ser):
     print(response)
     return response
 
-def returnCursor(ser):
-    bytesToSend = chr(0x06)
+def returnCursor(ser,vertical):
+    if vertical < 0:
+        vertical += 65535 + 1 # two's complement conversion
+    vb0 = vertical & 0xff # little byte
+    vb1 = (vertical >> 8) & 0xff # big byte
+
+    bytesToSend = chr(0x06) + chr(vb0) + chr(vb1)
     response = sendBytes(ser, bytesToSend)
 
     #response="Returned cursor to beginning of line."
@@ -157,7 +162,7 @@ def runServer(ser,port):
                     elif args['command'] == 'reset':
                         reply = resetTypewriter(ser)
                     elif args['command'] == 'return':
-                        reply = returnCursor(ser)
+                        reply = returnCursor(ser,args['vertical'])
                     elif args['command'] == 'characters':
                         reply = sendCharacters(ser, args['string_to_print'],args['spacing'])
                     elif args['command'] == 'microspaces':
