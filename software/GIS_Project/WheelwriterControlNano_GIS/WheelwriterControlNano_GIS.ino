@@ -109,7 +109,7 @@ void loop()
             //writeMicrospacesToEEPROM(microspaceCount);
             Serial.print("microspaceCount: ");
             Serial.println(microspaceCount);
-            Serial.write(0); // terminate with null
+            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
             charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
           }
           else if (command == 1) { // image to print
@@ -128,7 +128,7 @@ void loop()
             microspaceCount = 0;
             bold = underline = reverseText = false;
             Serial.println("reset");
-            Serial.write(0); // terminate with null
+            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
           } else if (command == 5) {
             // position cursor horizontally and vertically from current position
             // we expect four more bytes, as follows:
@@ -149,7 +149,7 @@ void loop()
             microspaceCount += horizontal;
             Serial.println("moved cursor by " + String(horizontal) + 
                 " horizontal microspaces and " + String(vertical) + " vertical microspaces");
-            Serial.write(0); // terminate with null
+            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
 
           } else if (command == 6) {
             // returns the cursor to the beginning of the line, based on microspaceCount
@@ -161,7 +161,7 @@ void loop()
             Serial.print("sent cursor to beginning of line with ");
             Serial.print(-microspaceCount);
             Serial.println(" microspaces");
-            Serial.write(0); // terminate with null
+            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
             //writeMicrospacesToEEPROM(0);
             microspaceCount = 0;
           } else if (command == 7) {
@@ -171,7 +171,7 @@ void loop()
             // report on microspaceCount
             Serial.print("microspaceCount: ");
             Serial.println(microspaceCount);
-            Serial.write(0); // terminate with null
+            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
           }
           else {
             charCount = printOne(command,charCount);

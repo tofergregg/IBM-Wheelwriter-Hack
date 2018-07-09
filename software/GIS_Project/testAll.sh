@@ -1,6 +1,7 @@
 #!/bin/bash
 
-#./send_command.py reset
+./send_command.py reset
+./send_command return
 #./send_command.py characters 'the quick ' 10
 #./send_command.py characters 'brown fox ' 8
 #./send_command.py characters 'jumps over the ' 6
@@ -14,7 +15,7 @@
 ./send_command.py return 20
 ./send_command.py characters 'and dedicated to the proposition that all men are created equal.'
 ./send_command.py return 5
-exit 0
+
 ./send_command.py characters 'Now we are engaged in a great civil war,' 15
 ./send_command.py return
 ./send_command.py characters 'testing whether that nation or any nation' 8

@@ -24,9 +24,10 @@ def sendBytes(ser, bytesToSend):
         ser.write(bytesToSend)
         response = ""
         while True:
-            response += ser.read(10)
+            response += ser.read(10).decode('utf-8')
             #print("resp:"+response)
-            if len(response) > 0 and response[-1] == '\0':
+            if len(response) > 0 and response[-1] == '\4':
+                response = response[:-1] # remove 0x04
                 print("response:"+response)
                 break
             time.sleep(0.1)
@@ -120,8 +121,8 @@ def sendCharacters(ser, stringToPrint, spacing):
         while True:
             response += ser.read(10).decode('utf-8')
             #print("resp:"+response)
-            if len(response) > 0 and response[-1] == '\0':
-                response = response[:-1] # remove null
+            if len(response) > 0 and response[-1] == '\4':
+                response = response[:-1] # remove '\4' 
                 break
             time.sleep(0.1)
     except KeyboardInterrupt:
