@@ -7,9 +7,17 @@ import json
 import time
 import serial
 import availablePorts
+import argparse
 
 DATA_AMOUNT = 1024
 MAXLINE = 40
+
+def getArgs():
+    parser = argparse.ArgumentParser(prog=sys.argv[0])
+   
+    parser.add_argument('-p','--port',type=int,default=10000,dest='port',help="the socket port, defaults to 10000")
+    parser.add_argument('serial_port',default=None,nargs='?',help="the serial port, e.g., '/dev/tty.wchusbserial1410'")
+    return vars(parser.parse_args())
 
 def sendBytes(ser, bytesToSend):
     try:
@@ -114,12 +122,12 @@ def sendCharacters(ser, stringToPrint, spacing):
     print(response)
     return response
 
-def runServer(ser):
+def runServer(ser,port):
     # Create a TCP/IP socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     # Bind the socket to the port
-    server_address = ('localhost', 10000)
+    server_address = ('localhost', port)
     print('starting up on %s port %s' % server_address)
     sock.bind(server_address)
 
@@ -170,19 +178,15 @@ def runServer(ser):
             connection.close()
             print
 
-def setupSerial():
+def setupSerial(portChoice):
     print("Setting up...")
     # if HARDCODED_PORT is '', then the user will get a choice
     #HARDCODED_PORT = '/dev/tty.wchusbserial1410'
     HARDCODED_PORT = ''
 
-    if len(sys.argv) > 1:
-        portChoice = sys.argv[1]
-    else:
-        portChoice = None
-        portChoiceInt = 0
     # choose port
     if portChoice == None:
+        portChoiceInt = 0
         if HARDCODED_PORT == '':
             ports = availablePorts.serial_ports()
 
@@ -207,9 +211,10 @@ def setupSerial():
     return ser
 
 if __name__ == '__main__':
+    args = getArgs()
     try:
-        ser = setupSerial()
-        runServer(ser)
+        ser = setupSerial(args['serial_port'])
+        runServer(ser,args['port'])
     except Exception as ex:
          template = "An exception of type {0} occurred. Arguments:\n{1!r}"
          message = template.format(type(ex).__name__, ex.args)
