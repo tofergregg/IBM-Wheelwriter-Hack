@@ -107,10 +107,12 @@ void loop()
             int spacing = buffer[2];
             microspaceCount = microspaceCount + bytesToPrint * spacing;
             //writeMicrospacesToEEPROM(microspaceCount);
+
+            //Serial.write(0x04); // terminate with 0x04 (end of transmission) 
+            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
             Serial.print("microspaceCount: ");
             Serial.println(microspaceCount);
-            Serial.write(0x04); // terminate with 0x04 (end of transmission) 
-            charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
+            Serial.write('\4');
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -179,6 +181,7 @@ void loop()
           digitalWrite(LED,0); // turn off LED when we are finished processing
       }
       // button for testing
+      /*
       byte button = digitalRead(4);
       if (button == 0) {
         //printOne("a",1);   
@@ -195,7 +198,7 @@ void loop()
         delay(100);
         digitalWrite(13,0);    
         resetTypewriter(); 
-      }
+      }*/
       delay(10);
 }
 
@@ -352,7 +355,6 @@ int printAllChars(char buffer[],
     if (fastPrinting) {
       fastTextFinish();
     }
-    Serial.println();
     return charCount;
 }
 

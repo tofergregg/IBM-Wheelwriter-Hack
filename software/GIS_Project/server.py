@@ -41,6 +41,7 @@ def sendBytes(ser, bytesToSend):
     return response
 
 def moveCursor(ser, horizontal, vertical):
+    print("Moving cursor %d microspaces horizontally and %d microspaces vertically" % (horizontal, vertical))
     # The horizontal and vertical microspaces are capped at +-32767
     # If either value is negative, we will convert it to two's complement
     # which will be easy to read on the Arduino
@@ -61,11 +62,10 @@ def moveCursor(ser, horizontal, vertical):
     bytesToSend = chr(0x05) + chr(hb0) + chr(hb1) + chr(vb0) + chr(vb1) 
 
     response = sendBytes(ser, bytesToSend)
-    #response = "Moved cursor %d horizontal microspaces and %d vertical microspaces." % (horz,vert)
-    print(response)
     return response 
 
 def resetTypewriter(ser):
+    print("Resetting typewriter...")
     bytesToSend = chr(0x04) 
     response = sendBytes(ser, bytesToSend)
 
@@ -74,6 +74,7 @@ def resetTypewriter(ser):
     return response
 
 def returnCursor(ser,vertical):
+    print("Returning cursor...")
     if vertical < 0:
         vertical += 65535 + 1 # two's complement conversion
     vb0 = vertical & 0xff # little byte
@@ -87,6 +88,7 @@ def returnCursor(ser,vertical):
     return response
 
 def getMicrospaces(ser):
+    print("Getting microspace count...")
     bytesToSend = chr(0x08)
     response = sendBytes(ser, bytesToSend)
 
@@ -95,6 +97,7 @@ def getMicrospaces(ser):
     return response
 
 def sendCharacters(ser, stringToPrint, spacing):
+    print('Sending "%s" with spacing %d...' % (stringToPrint,spacing))
     # get the text length
     textLen = len(stringToPrint) 
 
@@ -120,7 +123,9 @@ def sendCharacters(ser, stringToPrint, spacing):
         response = ""
         while True:
             response += ser.read(10).decode('utf-8')
-            #print("resp:"+response)
+            print("resp:"+response)
+            if len(response) > 0:
+                print(ord(response[-1]))
             if len(response) > 0 and response[-1] == '\4':
                 response = response[:-1] # remove '\4' 
                 break

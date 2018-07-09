@@ -1,15 +1,15 @@
 #!/bin/bash
 
 ./send_command.py reset
-./send_command return
-#./send_command.py characters 'the quick ' 10
-#./send_command.py characters 'brown fox ' 8
-#./send_command.py characters 'jumps over the ' 6
-#./send_command.py characters ' lazy dog' 15
-#./send_command.py return
-#./send_command.py movecursor 50 0
-#./send_command.py characters "some more text"
-#./send_command.py movecursor 0 20
+./send_command.py return
+./send_command.py characters 'the quick ' 10
+./send_command.py characters 'brown fox ' 8
+./send_command.py characters 'jumps over the ' 6
+./send_command.py characters ' lazy dog' 15
+./send_command.py return
+./send_command.py movecursor 50 0
+./send_command.py characters "some more text"
+./send_command.py movecursor 0 20
 
 ./send_command.py characters 'Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty,'
 ./send_command.py return 20
