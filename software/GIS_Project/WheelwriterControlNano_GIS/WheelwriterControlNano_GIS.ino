@@ -735,43 +735,22 @@ void send_return(int numChars) {
     sendByte(0b000000111);
     sendByte(0b100100001);
 
-    /*if (numChars <= 23 || numChars >= 26) {*/
-        sendByte(0b000000110);
+    sendByte(0b000000110);
 
-        // We will send two bytes from a 10-bit number
-        // which is numChars * 5. The top three bits
-        // of the 10-bit number comprise the first byte,
-        // and the remaining 7 bits comprise the second
-        // byte, although the byte needs to be shifted
-        // left by one (not sure why)
-        // the numbers are calculated above for timing reasons
-        sendByte(byte1);
-        sendByte(byte2); // each char is worth 10
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-
-    /*} else if (numChars <= 25) {
-        // not sure why this is so different
-        sendByte(0b000001101);
-        sendByte(0b000000111);
-        sendByte(0b100100001);
-        sendByte(0b000000110);
-        sendByte(0b000000000);
-        sendByte(numChars * 10);
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-    }*/
+    // We will send two bytes from a 10-bit number
+    // which is numChars * 5. The top three bits
+    // of the 10-bit number comprise the first byte,
+    // and the remaining 7 bits comprise the second
+    // byte, although the byte needs to be shifted
+    // left by one (not sure why)
+    // the numbers are calculated above for timing reasons
+    sendByte(byte1);
+    sendByte(byte2); // each char is worth 10
+    sendByte(0b100100001);
+    // right now, the platten is moving, maybe?
     
     sendByte(0b000000101);
     sendByte(0b010010000);
-
-    /*
-    sendByte(0b100100001);
-    
-
-    // send one more byte but don't wait explicitly for the response
-    // of 0b001010000
-    sendByteOnPin(0b000001011);*/
 
     // wait for carriage 
     //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
@@ -789,32 +768,19 @@ void send_return_microspaces(int numSpaces) {
     sendByte(0b000000111);
     sendByte(0b100100001);
 
-    /*if (numChars <= 23 || numChars >= 26) {*/
-        sendByte(0b000000110);
+    sendByte(0b000000110);
 
-        // We will send two bytes from a 10-bit number
-        // which is numChars * 5. The top three bits
-        // of the 10-bit number comprise the first byte,
-        // and the remaining 7 bits comprise the second
-        // byte, although the byte needs to be shifted
-        // left by one (not sure why)
-        // the numbers are calculated above for timing reasons
-        sendByte(byte1);
-        sendByte(byte2); // each char is worth 10
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-
-    /*} else if (numChars <= 25) {
-        // not sure why this is so different
-        sendByte(0b000001101);
-        sendByte(0b000000111);
-        sendByte(0b100100001);
-        sendByte(0b000000110);
-        sendByte(0b000000000);
-        sendByte(numChars * 10);
-        sendByte(0b100100001);
-        // right now, the platten is moving, maybe?
-    }*/
+    // We will send two bytes from a 10-bit number
+    // which is numChars * 5. The top three bits
+    // of the 10-bit number comprise the first byte,
+    // and the remaining 7 bits comprise the second
+    // byte, although the byte needs to be shifted
+    // left by one (not sure why)
+    // the numbers are calculated above for timing reasons
+    sendByte(byte1);
+    sendByte(byte2); // each char is worth 10
+    sendByte(0b100100001);
+    // right now, the platten is moving, maybe?
     
     sendByte(0b000000101);
     sendByte(0b010010000);

@@ -123,9 +123,7 @@ def sendCharacters(ser, stringToPrint, spacing):
         response = ""
         while True:
             response += ser.read(10).decode('utf-8')
-            print("resp:"+response)
-            if len(response) > 0:
-                print(ord(response[-1]))
+            #print("resp:"+response)
             if len(response) > 0 and response[-1] == '\4':
                 response = response[:-1] # remove '\4' 
                 break
