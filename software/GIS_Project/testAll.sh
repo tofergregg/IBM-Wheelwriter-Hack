@@ -28,6 +28,8 @@
 ./send_command.py return
 ./send_command.py characters 'so conceived and so dedicated, can long endure.'
 ./send_command.py return
+
+# print a box, slowly
 ./send_command.py characters '..........' 1
 ./send_command.py movecursor -1 0
 for i in `seq 1 10`; do
