@@ -2,6 +2,10 @@
 
 # 20 microspaces equals one regular space
 
+# The following should print
+# a b c d
+# and then print it again on top of the old a b c d
+
 ./send_command.py reset
 ./send_command.py return
 
