@@ -112,7 +112,8 @@ void loop()
             charCount = printAllChars(buffer,bytesToPrint,charCount, spacing);
             Serial.print("microspaceCount: ");
             Serial.println(microspaceCount);
-            Serial.write('\4');
+            Serial.write(0x04);
+            delay(LETTER_DELAY);
           }
           else if (command == 1) { // image to print
             //Serial.println("image");
@@ -756,6 +757,46 @@ void send_return(int numChars) {
     //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
 }
 
+void horiz_space(int microspaces) {
+    int neg = 0;
+    if (microspaces > 0) {
+      neg = 0b10000000;
+    } else {
+      microspaces = -microspaces;
+    }
+    
+    int byte1 = microspaces >> 8;
+    int byte2 = microspaces & 0xff;
+    
+    sendByte(0b100100001);
+    sendByte(0b000001011);
+    sendByte(0b100100001);
+    sendByte(0b000001101);
+    sendByte(0b000000111);
+    sendByte(0b100100001);
+
+    sendByte(0b000000110);
+
+    // We will send two bytes from a 10-bit number
+    // which is numChars * 5. The top three bits
+    // of the 10-bit number comprise the first byte,
+    // and the remaining 7 bits comprise the second
+    // byte, although the byte needs to be shifted
+    // left by one (not sure why)
+    // the numbers are calculated above for timing reasons
+    sendByte(neg | byte1);
+    sendByte(byte2); // each char is worth 10
+    sendByte(0b100100001);
+    // right now, the platten is moving, maybe?
+    
+    //sendByte(0b000000101);
+    sendByte(0b010010000);
+
+    // wait for carriage 
+    //delay(CARRIAGE_WAIT_BASE + CARRIAGE_WAIT_MULTIPLIER * numChars);
+}
+
+
 void send_return_microspaces(int numSpaces) {
     // calculations for further down
     int byte1 = (numSpaces) >> 7;
@@ -1058,11 +1099,12 @@ void beepTypewriter() {
 
 void moveCursor(int horizontal, int vertical) {
    // move horizontally first
-   if (horizontal > 0) {
-     forwardSpaces(horizontal);
+   horiz_space(horizontal);
+   /*if (horizontal > 0) {
+     //forwardSpaces(horizontal);
    } else {
      micro_backspace(-horizontal);
-   }
+   }*/
 
    // move vertically
    // (forgot why these commands are not symmetrical...)

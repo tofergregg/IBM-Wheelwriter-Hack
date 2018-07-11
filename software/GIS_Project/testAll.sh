@@ -37,12 +37,12 @@ for i in `seq 1 10`; do
     ./send_command.py characters '.' 0
 done
 
-for i in `seq 1 10`; do
+for i in `seq 1 9`; do
     ./send_command.py movecursor -1 0
     ./send_command.py characters '.' 0
 done
 
-for i in `seq 1 10`; do
+for i in `seq 1 9`; do
     ./send_command.py movecursor 0 -1
     ./send_command.py characters '.' 0
 done
