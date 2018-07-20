@@ -25,7 +25,7 @@ def sendBytes(ser, bytesToSend):
         response = ""
         while True:
             response += ser.read(10).decode('utf-8')
-            print("resp:"+response)
+            #print("resp:"+response)
             if len(response) > 0 and response[-1] == '\4':
                 response = response[:-1] # remove 0x04
                 print("response:"+response)

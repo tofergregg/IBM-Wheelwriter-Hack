@@ -26,23 +26,23 @@ def getArgs():
 
     # create the parser for the "characters" command
     parser_a = subparsers.add_parser('characters', help='characters help')
-    parser_a.add_argument('string_to_print')
-    parser_a.add_argument("spacing", type=int, default=10, nargs='?')
+    parser_a.add_argument('string_to_print', help='e.g., "this is some text"')
+    parser_a.add_argument("spacing", type=int, default=10, nargs='?', help="e.g., 12 (default is 10)")
 
     # create the parser for the "return" command
     parser_b = subparsers.add_parser('return', help='return help')
-    parser_b.add_argument("vertical", type=int,default=16, nargs='?')
+    parser_b.add_argument("vertical", type=int,default=16, nargs='?', help="e.g., 10 (default is 16)")
 
     # create the parser for the "reset" command
     parser_c = subparsers.add_parser('reset', help='reset help')
 
     # create the parser for the "movecursor" command
     parser_d = subparsers.add_parser('movecursor', help='movecursor help')
-    parser_d.add_argument("horizontal", type=int, help="horizontal microspaces, positive is right, negative is left")
-    parser_d.add_argument("vertical", type=int, help="vertical microspaces, positive is down, negative is up")
+    parser_d.add_argument("horizontal", type=int, help="horizontal microspaces, positive is right, negative is left, e.g. 10")
+    parser_d.add_argument("vertical", type=int, help="vertical microspaces, positive is down, negative is up, e.g., -10")
 
     # create the parser for the "reset" command
-    parser_e = subparsers.add_parser('microspaces', help='microspaces help')
+    parser_e = subparsers.add_parser('microspaces', help='prints the number of horizontal microspaces so far on a line')
     
     return vars(parser.parse_args())
 

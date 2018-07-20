@@ -1100,11 +1100,6 @@ void beepTypewriter() {
 void moveCursor(int horizontal, int vertical) {
    // move horizontally first
    horiz_space(horizontal);
-   /*if (horizontal > 0) {
-     //forwardSpaces(horizontal);
-   } else {
-     micro_backspace(-horizontal);
-   }*/
 
    // move vertically
    // (forgot why these commands are not symmetrical...)

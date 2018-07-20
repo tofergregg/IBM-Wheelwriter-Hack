@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 20 microspaces equals one regular space
+# 10 microspaces equals one regular space 
 
 # The following should print
 # a b c d
@@ -12,6 +12,7 @@
 ./send_command.py characters "a b c d"
 ./send_command.py return 0
 
+# put a regular space in between each character
 ./send_command.py characters "a" 0
 ./send_command.py movecursor 20 0
 
