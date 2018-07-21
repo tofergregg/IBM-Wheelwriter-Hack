@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# 20 microspaces equals one regular space
+# 10 microspaces equals one regular space
 
 ./send_command.py reset
 
