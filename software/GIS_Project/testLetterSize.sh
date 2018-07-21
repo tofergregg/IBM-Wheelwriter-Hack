@@ -16,7 +16,6 @@
 ./send_command.py characters "." 0
 ./send_command.py return
 
-exit 0
 # send 10 * 100 = 1000 periods, spaced 1-microspace apart
 for i in `seq 1 10`; do
     echo "sending 100 periods at 1-microspace per period"
