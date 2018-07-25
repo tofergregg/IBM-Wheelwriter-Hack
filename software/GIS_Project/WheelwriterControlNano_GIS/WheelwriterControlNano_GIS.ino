@@ -6,7 +6,7 @@
          sending data
  */
 
-#include <EEPROM.h>
+//#include <EEPROM.h>
 
 #define LETTER_DELAY 450
 #define CARRIAGE_WAIT_BASE 200
