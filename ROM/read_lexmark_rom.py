@@ -18,6 +18,7 @@ if __name__ == "__main__":
 
     # datasheet: https://www.datasheets360.com/pdf/1277907997291200345?xrefPartId=1277907997291200345&alternatePartManufacturerId=0
     # KM23C256 pins 
+    # Raspberry Pi Pinout with BCM numbering: https://pinout.xyz
 
     #ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2]
     ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2,26,19]
