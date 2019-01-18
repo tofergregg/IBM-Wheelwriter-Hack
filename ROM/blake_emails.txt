@@ -1,0 +1,35 @@
+Hi Blake,
+
+  I went into school today and figured out how to dump the ROM chips from the typewriter I was telling you about — it is an IBM (Lexmark) Wheelwriter 15, from about 1993 or so (https://publications.lexmark.com/publications/pdfs/2007/typewriters/Wheelwriter-15sII.pdf).
+
+  I’ve attached the two ROMs if you want to look at them. They are both IBM 8086/8088 assembly language programs, which you can disassemble on a Linux machine with the following command:
+
+objdump -D -b binary -m i8086 –adjust-vma=0×100 rom.bin
+
+  It looks like rom.bin sets up the interrupts, although that’s about as far as I have gotten (with some help from Michael Chang, who works on software for the department and occasionally teaches CS 107).
+
+  Interestingly, I was looking at the PCB on the typewriter and there are two flex-ribbon ports that aren’t used. I have a feeling it would be possible to figure out how to use them to connect a computer for use as a printer, though it will take some serious reverse engineering to figure it out.
+
+  Anyway, let me know if you discover anything with the ROMs, and stop by in the new year and we can investigate the typewriter together.
+
+-Chris
+
+  In the interest of actually running some code, I decided to install DOSBOX (https://www.dosbox.com/download.php?main=1). I found a copy of the gdb-of-its-day DEBUG.COM, which you can download here:
+
+http://stanford.edu/~cgregg/wheelwriter/DEBUG.COM
+
+  The easiest thing to do is to put the roms and DEBUG.COM into a folder, and then mount the folder, e.g., (on my Mac):
+
+mount D “/Volumes/Macintosh HD/Downloads/typewriter_rom” # mounts drive as D:
+D:
+debug rom.bin
+
+  In debug, the help command is a question mark (?), and most commands are one-letter:
+
+u : unassemble (the program starts at 0x100, and just typing ‘u’ will start it there)
+t : trace (similar to step in gdb — I believe it always steps into calls)
+p : proceed (similar to continue, though I think it stops at the end of a call)
+g : go (runs the program)
+
+Much more information about DEBUG.COM here: https://thestarman.pcministry.com/asm/debug/debug.htm  (and it looks like there may be a better version of debug there, so I will try it).
+
