@@ -1,0 +1,4 @@
+This is regular text.
+This should be ten squared plus five: 10S02T + 5
+This should be water: HS12TO
+This should be regular text again

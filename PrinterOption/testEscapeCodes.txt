@@ -1,0 +1,8 @@
+This is regular text.
+Ethis is bold.F
+this should not be bold.
+-1this should be underlined.-0
+this should not be underlined.
+This should be ten squared plus five: 10S02T + 5
+This should be water: HS12TO
+This should be regular again.
