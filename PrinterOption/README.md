@@ -6,7 +6,13 @@ To print a file:
 
 lpr -P "WheelwriterUSB" file.txt
 
-The printer needs both a line feed and a carriage return to get to the beginning of a line (e.g., 0xa0xd). To produce this in vim in insert mode, type ctrl-v ctrl-M to put in the extra carriage return.
+The printer needs both a line feed and a carriage return to get to the beginning of a line (e.g., 0xa0xd). To produce this in vim in insert mode, type ctrl-v ctrl-M to put in the extra carriage return. 
+
+Note: if you put a carriage return at the end of each line, vim will convert it to dos format, which means that you won't see the ^M any more. To set the file format manually:
+
+`:set fileformat` (see the format)
+`:set fileformat=dos` (put CRLF)
+`:set fileformat=unix` (put LF only)
 
 To add carriage returns to all lines in vim:
 
