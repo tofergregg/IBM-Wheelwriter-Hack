@@ -1,0 +1,9 @@
+This is a line of text.JThis is a line of text.
+The above lines should have printed twice but the
+second line should have been 3 "pixels" lower.
+This is another line of text.JThis is another line of text.
+The above lines should have printed twice but the
+second line should have been 6 "pixels" lower.
+This is another line of text.JThis is another line of text.
+The above lines should have printed twice but the
+second line should have been 1 "pixel" lower.
