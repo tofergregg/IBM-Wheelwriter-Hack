@@ -172,7 +172,11 @@ def runServer(ser,port):
                     elif args['command'] == 'return':
                         reply = returnCursor(ser,args['vertical'])
                     elif args['command'] == 'characters':
-                        reply = sendCharacters(ser, args['string_to_print'],args['spacing'])
+                        st = args['string_to_print']
+                        if len(st) > 0:
+                            reply = sendCharacters(ser, st,args['spacing'])
+                        else:
+                            reply = "Empty string, no characters sent."
                     elif args['command'] == 'microspaces':
                         reply = getMicrospaces(ser)
                     else:
