@@ -25,19 +25,20 @@ def getArgs():
     subparsers = parser.add_subparsers(help='sub-command help',dest='command')
 
     # create the parser for the "characters" command
-    parser_a = subparsers.add_parser('characters', help='characters help')
+    parser_a = subparsers.add_parser('characters', help='characters -h')
     parser_a.add_argument('string_to_print', help='e.g., "this is some text"')
     parser_a.add_argument("spacing", type=int, default=10, nargs='?', help="e.g., 12 (default is 10)")
+    parser_a.add_argument("-m", "--allow-markup", help="** for bold, __ for underline, escape with \\** or \\__", action='store_true')
 
     # create the parser for the "return" command
-    parser_b = subparsers.add_parser('return', help='return help')
+    parser_b = subparsers.add_parser('return', help='return -h')
     parser_b.add_argument("vertical", type=int,default=16, nargs='?', help="e.g., 10 (default is 16)")
 
     # create the parser for the "reset" command
-    parser_c = subparsers.add_parser('reset', help='reset help')
+    parser_c = subparsers.add_parser('reset', help='reset -h')
 
     # create the parser for the "movecursor" command
-    parser_d = subparsers.add_parser('movecursor', help='movecursor help')
+    parser_d = subparsers.add_parser('movecursor', help='movecursor -h')
     parser_d.add_argument("horizontal", type=int, help="horizontal microspaces, positive is right, negative is left, e.g. 10")
     parser_d.add_argument("vertical", type=int, help="vertical microspaces, positive is down, negative is up, e.g., -10")
 
@@ -95,6 +96,8 @@ if __name__ == "__main__":
     args = getArgs()
     if args['command'] == "characters":
         print('Typing "%s" with spacing %d.' % (args['string_to_print'],args['spacing']))
+        if args['allow_markup']:
+            print("Markup will be translated for bold and underline.")
     elif args['command'] == "return":
         print('Returning cursor to beginning of line.')
     elif args['command'] == "reset":

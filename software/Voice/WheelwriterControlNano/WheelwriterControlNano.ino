@@ -72,7 +72,7 @@ void setup()
 void loop() 
 {
       static int charCount = 0;
-      static int microspaceCount = 0;
+      //static int microspaceCount = 0;
       unsigned char buffer[70]; // 64 plus a few extra for some run-over commands (e.g., reverse)
       uint8_t readLength = 65;
       uint8_t bytesRead = 0;
@@ -105,6 +105,8 @@ void loop()
             Serial.readBytes(buffer,3);
             bytesToPrint = buffer[0] + (buffer[1] << 8); // little-endian
             int spacing = buffer[2];
+            // microspaceCount should not count bold and underline characters
+            // but that will get taken care of when we actually print the characters
             microspaceCount = microspaceCount + bytesToPrint * spacing;
             //writeMicrospacesToEEPROM(microspaceCount);
 
@@ -303,9 +305,13 @@ int printAllChars(char buffer[],
           // check for underline and bold
           if (buffer[bufferPos] == 2) { // bold
               bold = !bold;
+              // decrement microspaceCount
+              microspaceCount -= spacing;
           }
           else if (buffer[bufferPos] == 3) { // underline
               underline = !underline;
+              // decrement microspaceCount
+              microspaceCount -= spacing;
           }
           else if (buffer[bufferPos] == 5) { // reverse instruction
               // we might need to read in more of the command, which
@@ -1121,5 +1127,3 @@ void writeMicrospacesToEEPROM(int m) {
     EEPROM.update(1,(m >> 8) & 0xff);
 }
 */
-
-

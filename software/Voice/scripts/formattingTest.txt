@@ -1,9 +1,0 @@
-Here is some text that is **bold**.
-Here is some text that is __underlined__.
-This __underlined text spans
-across two lines__, and this **bold text
-spans across two lines**. This is regular text.
-__**This text is both bold and underlined**__.
-This is an example of an asterisk and underline on their own: * and _.
-If we want two asterisks, we have to escape one of them: \**
-We have to be careful to escape any two in a row: \**\**\**.

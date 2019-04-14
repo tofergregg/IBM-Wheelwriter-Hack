@@ -1,0 +1,12 @@
+Hello, Nick!
+
+  Here is the Wheelwriter printer connector you requested. Enjoy!
+
+  Obviously, feel free to email me for more instructions, but this should get you up to speed:
+
+1. If you have a Mac, everything should be ready to go. With a Windows PC, I think we may need to talk directly.
+
+2. Assuming you are on a Mac, open up a terminal, and type the following (feel free to change to whatever directory you want, but this will put the software into your home folder):
+
+**git clone https://github.com/tofergregg/IBM-Wheelwriter-Hack.git**
+cd 

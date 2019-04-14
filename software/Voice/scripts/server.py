@@ -96,6 +96,43 @@ def getMicrospaces(ser):
     print(response)
     return response
 
+def parseForMarkup(text):
+    '''Returns a list that holds text, bold markup (**) or underline markup (__)
+    characters. E.g., ["This is ","**","bold","**","and this is ","__","underlined","__"]'''
+    # read one character at a time until we get to a bold or underline. 
+    # We skip escaped markup
+    # We will have to employ lookahead when we find some potential markup
+    BOLD_CODE = chr(2) # will be sent to arduino to toggle bold
+    UNDERLINE_CODE = chr(3) # sent to arduino to toggle underline
+    curStr = ""
+    escaped = False
+    i = 0
+    while (i < len(text)): 
+        c = text[i]
+        # handle all but last character
+        if i != len(text)-1:
+            nextC = text[i+1]
+            if not escaped and c == '*' and nextC == '*':
+                # bold
+                curStr += BOLD_CODE
+                i += 1
+            elif not escaped and c == '_' and nextC == '_':
+                # underline 
+                curStr += UNDERLINE_CODE
+                i += 1
+            elif escaped:
+                # both the backslash and the char should be printed
+                curStr+= '\\' + c
+                escaped = False
+            elif c == "\\": #escape character
+                escaped = True
+            else:
+                curStr += c
+        else:
+            curStr += c
+        i += 1
+    return curStr 
+
 def sendCharacters(ser, stringToPrint, spacing):
     print('Sending "%s" with spacing %d...' % (stringToPrint,spacing))
     # get the text length
@@ -174,6 +211,8 @@ def runServer(ser,port):
                     elif args['command'] == 'characters':
                         st = args['string_to_print']
                         if len(st) > 0:
+                            if args['allow_markup']:
+                                st = parseForMarkup(st)
                             reply = sendCharacters(ser, st,args['spacing'])
                         else:
                             reply = "Empty string, no characters sent."
@@ -228,6 +267,7 @@ def setupSerial(portChoice):
     return ser
 
 if __name__ == '__main__':
+    #import pdb; pdb.set_trace()
     args = getArgs()
     try:
         ser = setupSerial(args['serial_port'])
