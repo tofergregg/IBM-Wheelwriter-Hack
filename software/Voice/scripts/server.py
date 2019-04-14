@@ -122,7 +122,12 @@ def parseForMarkup(text):
                 i += 1
             elif escaped:
                 # both the backslash and the char should be printed
-                curStr+= '\\' + c
+                # unless it is "*" or "_", in which case just
+                # the "*" or "_" should be printed
+                if c == "*" or c == "_":
+                    curStr += c
+                else:
+                    curStr+= '\\' + c
                 escaped = False
             elif c == "\\": #escape character
                 escaped = True

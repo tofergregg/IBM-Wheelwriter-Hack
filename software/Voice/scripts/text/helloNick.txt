@@ -2,35 +2,38 @@ Hello, Nick!
 
   Here is the Wheelwriter printer connector you requested. Enjoy!
 
-  Obviously, feel free to email me for more instructions, but this should get you up to speed:
+  Obviously, feel free to email me for more instructions, but this should get
+you up to speed:
 
-1. If you have a Mac, everything should be ready to go. With a Windows PC, I think we may 
-need to talk directly.
+1. If you have a Mac, everything should be ready to go. With a Windows PC, I 
+think we may need to talk directly.
 
-2. Go ahead and plug the device into your typewriter, in the proper orientation as shown 
-on the connector. Plug the other end into your computer. You may need to set up a device 
-driver, so if the following doesn't work automatically, email me and we'll figure it out.
+2. Go ahead and plug the device into your typewriter, in the proper orientation 
+as shown on the connector. Plug the other end into your computer. You may need 
+to set up a device driver, so if the following doesn't work automatically, email
+me and we'll figure it out.
 
-2. Assuming you are on a Mac, open up a terminal, and type the following (feel free to 
-change to whatever directory you want, but this will put the software into your home folder):
+2. Assuming you are on a Mac, open up a terminal, and type the following (feel 
+free to change to whatever directory you want, but this will put the software 
+into your home folder):
 
 **git clone https://github.com/tofergregg/IBM-Wheelwriter-Hack.git
 cd IBM-Wheelwriter-Hack/software/Voice/scripts/
 ./server.py**
 
-You should see a message that says, "Setting up..." and it may choose the device for you
-(or you may have to choose -- the one you want should be labeled something like
-"/dev/tty.usbserial-14330".
+You should see a message that says, "Setting up..." and it may choose the device
+for you (or you may have to choose -- the one you want should be labeled 
+something like "/dev/tty.usbserial-14330".
 
 If it works, you should see a message that says, "Waiting for a connection"
 
-3. Open a **new** terminal using Shell->New Window
+3. Open a **new** terminal using Shell--New Window
 4. Type:
 **cd IBM-Wheelwriter-Hack/software/Voice/scripts/
 ./simpleTest.sh**
 
-Hopefully, you will see "Hello, World!" printed on the typewriter. If you don't, we can
-troubleshoot.
+Hopefully, you will see "Hello, World!" printed on the typewriter. If you don't,
+we can troubleshoot.
 
 5. For more advanced tests, you can type:
 **./testDocSend.sh
@@ -38,20 +41,20 @@ troubleshoot.
 ./sendDoc.sh text/formattingTest.txt**
 
 6. In general, if you just want to send text, type the following:
-./send_command.py characters "This is some text"
+**./send_command.py characters "This is some text"**
 
 7. If you want to add some formatting, like bold (\**) and underline (\__), you
 can use the "-m" flag:
-**./send_command.py characters -m "This is **some bold** text"
+**./send_command.py characters -m "This is \**some bold\** text"**
 
 8. If you want to send a file, you can type:
 **./sendDoc.sh filename.txt**
 
-Just remember that there is no auto-returning, so each line should be less than about 80
-characters, and plain (or formatted, as described above) text.
+Just remember that there is no auto-returning, so each line should be less 
+than about 80 characters, and plain (or formatted, as described above) text.
 
-Again, let me know if you have any troubles. I will work on some voice-activated typing
-in the near future. Cheers!
+Again, let me know if you have any troubles. I will work on some voice-activated 
+typing in the near future. Cheers!
 
--Chris
+Chris
 
