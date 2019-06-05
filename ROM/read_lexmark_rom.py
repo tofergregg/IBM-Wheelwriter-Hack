@@ -15,9 +15,9 @@ if __name__ == "__main__":
         quit()
 
     GPIO.setmode(GPIO.BCM)
-
-    # datasheet: https://www.datasheets360.com/pdf/1277907997291200345?xrefPartId=1277907997291200345&alternatePartManufacturerId=0
-    # KM23C256 pins 
+    
+    # datasheet: https://www.digchip.com/datasheets/download_datasheet.php?id=385293&part-number=HT23C010
+    # HT23C010 (or similar), 32-pin ROM
     # Raspberry Pi Pinout with BCM numbering: https://pinout.xyz
 
     #ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2]
