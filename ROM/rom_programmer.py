@@ -277,7 +277,7 @@ if __name__ == "__main__":
             else:
                 print('Must have either 0 or 2 values for read (0 means "read entire chip")')
                 quit()
-            if args['filename'] != '':
+            if args['filename']:
                 print("Writing output to {}.".format(args['filename']))
                 with open(args['filename'],"wb") as f:
                     f.write(allData)
