@@ -9,7 +9,7 @@ import argparse
 FULL_CHIP_SIZE = (1 << 17) # 128K
 
 # datasheet: https://www.datasheets360.com/pdf/1277907997291200345?xrefPartId=1277907997291200345&alternatePartManufacturerId=0
-# KM23C256 pins
+# KM23C256 pins 
 
 #ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2]
 ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2,26,19]
@@ -80,7 +80,7 @@ def getChipId():
         GPIO.output(OE, 1)
         GPIO.output(CE, 0)
         GPIO.output(WE, 0)
-        #time.sleep(100./1000000)
+        #time.sleep(100./1000000) 
 
         GPIO.output(WE, 1)
 #        GPIO.output(OE, 0)
@@ -97,20 +97,20 @@ def getChipId():
     GPIO.output(OE, 1)
     GPIO.output(CE, 0)
     GPIO.output(WE, 0)
-    time.sleep(100./1000000)
+    time.sleep(100./1000000) 
 
     GPIO.output(WE, 1)
     GPIO.output(OE, 0)
     GPIO.output(CE, 1)
 
 def programByte(addr, data):
-    '''Programs a byte at addr (must be 0xFF to begin, meaning that the sector or chip  must have been
+    '''Programs a byte at addr (must be 0xFF to begin, meaning that the sector or chip  must have been 
     erased at some point prior to the write. To write, we first send a set of three bytes:
     0xAA at address 0x5555
     0x55 at address 0x2AAA
     0xA0 at address 0x5555
     Then we send byte at addr, and then we check DQ7 until it reads the correct value at least three times
-    '''
+    ''' 
     MAX_DATA_READS = 10
     # import pdb; pdb.set_trace()
 
@@ -125,7 +125,7 @@ def programByte(addr, data):
         GPIO.output(OE, 1)
         GPIO.output(CE, 0)
         GPIO.output(WE, 0)
-        time.sleep(100./1000000)
+        time.sleep(100./1000000) 
 
         GPIO.output(WE, 1)
         #GPIO.output(OE, 0)
@@ -189,7 +189,7 @@ def readData(startAddr, endAddr, verbose=False):
         d = readByte(addr)
         #import pdb; pdb.set_trace()
 
-        if (verbose):
+        if (verbose): 
             print(hex(d), end=' ')
             sys.stdout.flush()
         else:
@@ -244,7 +244,7 @@ def writeFileToChip(filename):
                 print("{}K, ".format((addr + 1) // 1024), end = '')
                 sys.stdout.flush()
         print("Done!")
-
+        
 
 if __name__ == "__main__":
     args = parseArgs()
@@ -264,7 +264,7 @@ if __name__ == "__main__":
                     addr1 = int(val1Str,16) # base 16
                 else:
                     addr1 = int(val1Str) # base 10
-
+                
                 val2Str = args['readVals'][1]
                 if val2Str.startswith('0x'):
                     addr2 = int(val2Str,16) # base 16
@@ -285,7 +285,7 @@ if __name__ == "__main__":
         elif (args['command'] == 'write'):
             print("Writing '{}' to the chip.".format(args['filename']))
             writeFileToChip(args['filename'])
-
+            
         elif (args['command'] == 'erase'):
             ans = input("Are you SURE you want to erase the entire chip? Please type 'yes': ")
             if ans == 'yes':
@@ -294,7 +294,6 @@ if __name__ == "__main__":
             else:
                 print("Not erasing the chip.")
 
-
     except KeyboardInterrupt:
         print("Keyboard interrupt...")
     except:
@@ -302,4 +301,3 @@ if __name__ == "__main__":
         traceback.print_exc()
     finally:
         GPIO.cleanup()
-
