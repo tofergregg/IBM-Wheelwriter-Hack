@@ -11,6 +11,9 @@ FULL_CHIP_SIZE = (1 << 17) # 128K
 # datasheet: https://www.datasheets360.com/pdf/1277907997291200345?xrefPartId=1277907997291200345&alternatePartManufacturerId=0
 # KM23C256 pins 
 
+# datasheet for flash chip: http://ww1.microchip.com/downloads/en/DeviceDoc/20005022C.pdf
+# Microchip SST39SF010A
+
 #ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2]
 ADDR = [1,7,8,25,24,23,18,15,4,17,10,27,14,3,2,26,19]
 DATA = [12,16,20,13,6,5,0,11]
