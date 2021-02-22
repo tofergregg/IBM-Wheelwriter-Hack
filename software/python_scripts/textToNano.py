@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # coding=utf-8
 
 # note: if you are on linux, you might have to run
@@ -114,13 +114,13 @@ try:
         remainingText = remainingText[MAXLINE:]
         if chars == '':
             break
-        ser.write(stringHeader + chars)
+        ser.write(stringHeader.encode() + chars.encode())
         stringHeader = ''  # not needed any more
         sys.stdout.write(chars)
         sys.stdout.flush()
         response = ""
         while True:
-            response += ser.read(10)
+            response += ser.read(10).decode('utf-8')
             #print("resp:"+response)
             if len(response) > 0 and response[-1] == '\n':
                 # print("(bytes written:"+response.rstrip()+")")
