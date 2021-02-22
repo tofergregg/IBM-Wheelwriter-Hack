@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 import socket
 import sys
@@ -21,7 +21,7 @@ def getArgs():
 
 def sendBytes(ser, bytesToSend):
     try:
-        ser.write(bytesToSend)
+        ser.write(bytesToSend.encode())
         response = ""
         while True:
             response += ser.read(10).decode('utf-8')
@@ -123,7 +123,7 @@ def sendCharacters(ser, stringToPrint, spacing):
         response = ""
         while True:
             response += ser.read(10).decode('utf-8')
-            #print("resp:"+response)
+            # print("resp:"+response)
             if len(response) > 0 and response[-1] == '\4':
                 response = response[:-1] # remove '\4' 
                 break
@@ -158,7 +158,7 @@ def runServer(ser,port):
 
             # Receive the data in small chunks and retransmit it
             while True:
-                data = connection.recv(DATA_AMOUNT)
+                data = connection.recv(DATA_AMOUNT).decode('utf-8')
                 if data:
                     # print('received "%s"' % data)
                     fullData += data
@@ -181,9 +181,13 @@ def runServer(ser,port):
                         reply = getMicrospaces(ser)
                     else:
                         reply = "not a known command"
-                    connection.sendall(reply)
+                    print("about to sendall")
+                    connection.sendall(reply.encode())
+                    print("finished sendall")
                     # print('sending "%s" to typewriter' % args)
-                    connection.sendall('\0')
+                    print("about to sendall again")
+                    connection.sendall('\0'.encode())
+                    print("finished sendall again")
                     break
         except Exception as ex:
             print("Exception in runServer.") 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # coding=utf-8
 
 # note: if you are on linux, you might have to run
@@ -63,7 +63,7 @@ def send_command(args):
         # Send data
         message = json.dumps(args) 
         # sys.stderr.write('sending "%s"\n' % message)
-        sock.sendall(message)
+        sock.sendall(message.encode())
         sock.shutdown(socket.SHUT_WR)
 
         # Look for the response
@@ -73,7 +73,7 @@ def send_command(args):
         done = False
         while True:
             try:
-                data = sock.recv(DATA_AMOUNT)
+                data = sock.recv(DATA_AMOUNT).decode('utf-8')
                 if len(data) > 0:
                     if data[-1] == '\0':
                         done=True
