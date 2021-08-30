@@ -130,7 +130,7 @@ The circuit used to connect the typewriter to an Arduino is extremely simple.
 See the KiCad files for full schematic ([hardware/Arduino_NanoShield folder](hardware/Arduino_NanoShield)) of a Nano shield,
 or order the part directly from OSH Park (under $6 for three copies):
 
-<a href="https://oshpark.com/shared_projects/HWk60tsg"><img src="https://oshpark.com/assets/badge-5b7ec47045b78aef6eb9d83b3bac6b1920de805e9a0c227658eac6e19a045b9c.png" alt="Order from OSH Park"></img></a>
+<a href="https://oshpark.com/shared_projects/HWk60tsg"><img src="https://644db4de3505c40a0444-327723bce298e3ff5813fb42baeefbaa.ssl.cf1.rackcdn.com/3d53e8da897c15e2c6209d808f426291.png" alt="Order from OSH Park"></img></a>
 
 (Note: you will need two surface-mount components for the shield: a 
 [200&#8486; 1206 resistor ($0.10 at Digikey)](http://www.digikey.com/product-detail/en/yageo/RC1206JR-07200RL/311-200ERCT-ND/732194)
